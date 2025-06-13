@@ -1,0 +1,102 @@
+[
+  {
+    "emotion": "happy",
+    "tone": "playful",
+    "intention": "energize and celebrate mood",
+    "story_intros": [
+      "Once upon a sunny morning, a joyful rabbit named Juno bounced through a field of singing flowers, looking for someone to play with.",
+      "In a bright garden, a giggling kitten found a bubble wand and began making sparkles float into the sky.",
+      "On a cheerful day, a group of friendly clouds played tag across the sky, making silly shapes for anyone watching."
+    ]
+  },
+  {
+    "emotion": "curious",
+    "tone": "whimsical",
+    "intention": "encourage discovery in a safe way",
+    "story_intros": [
+      "In the heart of a glowing forest, a clever robot named Piko discovered a trail of glowing stones that led to a gentle mystery.",
+      "A soft breeze whispered to Kiki the squirrel, carrying a secret map tucked into a fallen leaf.",
+      "Deep in the grasslands, a young explorer named Nia heard a soft chime coming from a tiny, hidden door."
+    ]
+  },
+  {
+    "emotion": "tired",
+    "tone": "soothing",
+    "intention": "prepare for rest",
+    "story_intros": [
+      "As the stars began to twinkle, a sleepy bear named Buu curled under a cozy tree and let out a soft sigh.",
+      "In a quiet burrow, a rabbit listened to the night’s hum while sipping warm berry tea.",
+      "A gentle owl flew silently across the sky, looking for the perfect branch to perch and watch the moon."
+    ]
+  },
+  {
+    "emotion": "anxious",
+    "tone": "reassuring",
+    "intention": "bring back emotional safety",
+    "story_intros": [
+      "Nilo the fox was feeling wobbly today, so their friends built a blanket fort filled with glowing lights and calm music.",
+      "In a nest of soft feathers, a little chick sat quietly, watching the rain and listening to their heartbeat slow down.",
+      "Tomo the turtle carried a warm stone in his shell that always helped when things felt too fast."
+    ]
+  },
+  {
+    "emotion": "upset",
+    "tone": "empathetic",
+    "intention": "reflect, acknowledge, and soothe",
+    "story_intros": [
+      "Zia the dragon had a storm in her tummy, so she flew to a quiet cloud to talk with Owl who always listened.",
+      "A grumpy hedgehog named Pip stomped through the garden until a butterfly landed gently on his nose.",
+      "Lani the lion felt a big roar coming, so she wrapped herself in her favorite fuzzy scarf and breathed deep."
+    ]
+  },
+  {
+    "emotion": "overstimulated",
+    "tone": "calm",
+    "intention": "slow pacing, minimal input",
+    "story_intros": [
+      "Lumi the turtle glided through a soft, misty stream, counting tiny bubbles one by one.",
+      "In the quiet cave, a glowing mushroom blinked softly while everything else stayed still.",
+      "A cloud named Mo floated slowly across the sky, noticing the quiet world below with no rush."
+    ]
+  },
+  {
+    "emotion": "stressed",
+    "tone": "safe",
+    "intention": "offer structure and control",
+    "story_intros": [
+      "Timo the mouse stacked pebbles one at a time, each click grounding him in the garden’s quiet rhythm.",
+      "In a peaceful room, a girl named Ella folded paper stars and lined them up in rows to feel calm again.",
+      "Oro the otter used his favorite counting song to paddle evenly across the lake, one stroke at a time."
+    ]
+  },
+  {
+    "emotion": "sad",
+    "tone": "warm",
+    "intention": "provide companionship and belonging",
+    "story_intros": [
+      "Yuna the penguin walked slowly across the ice until she met a puffin who offered her a warm scarf and quiet company.",
+      "In the fog, a soft hand reached out and held Koda the kitten’s paw without saying a word.",
+      "A lonely sound drifted through the forest, and a firefly blinked gently in reply, staying close."
+    ]
+  },
+  {
+    "emotion": "lonely",
+    "tone": "gentle",
+    "intention": "restore connection",
+    "story_intros": [
+      "Soli the deer found a stone with a heart drawn on it and a note that said, “You are not alone.”",
+      "In a quiet treehouse, a voice whispered from a radio: 'Hello, I’m here too.'",
+      "A paper boat floated into Mira’s pond, carrying a drawing of two friends holding hands."
+    ]
+  },
+  {
+    "emotion": "neutral",
+    "tone": "soft",
+    "intention": "support wind-down and calm",
+    "story_intros": [
+      "The moon rose slowly as Luma the cat curled into their favorite blanket, purring softly with the breeze.",
+      "In a cabin filled with pillows, Zee the zebra traced the stars with their hoof, eyes growing heavier.",
+      "Every night, a bell chimed softly three times, and the world slowed down for dream-time to begin."
+    ]
+  }
+]
