@@ -7,8 +7,11 @@ name = "miramind"
 version = "0.1.0"
 description = "Virtual companion for neurodivergent children"
 authors = [
-    {name = #TODO}
+    "Adam Kołacz",
+    "Marcel Musiałek",
+    "Mikołaj Marsy"
 ]
+
 readme = "README.md"
 requires-python = ">=3.10"
 classifiers = [
