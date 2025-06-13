@@ -11,6 +11,7 @@ authors = [
     {name = "Mikolaj Marsy"},
     {name = "Adam Kołacz"},
 ]
+
 readme = "README.md"
 requires-python = ">=3.10"
 classifiers = [
