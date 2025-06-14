@@ -1,5 +1,5 @@
 from typing import Dict, Callable
-from base import TTSProvider
+from miramind.audio.tts.tts_base import TTSProvider
 
 
 def get_tts_provider(name: str = None) -> TTSProvider:
