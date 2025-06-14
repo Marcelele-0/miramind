@@ -4,9 +4,63 @@ import azure.cognitiveservices.speech as speechsdk
 
 from ...shared.logger import logger
 from .tts_base import TTSProvider
+import asyncio
 
 
 class AzureTTSProvider(TTSProvider):
+    async def synthesize_async(self, input_json: str) -> bytes:
+        """
+        Asynchronous version of synthesize for better performance in async environments.
+        """
+        try:
+            data = json.loads(input_json)
+        except json.JSONDecodeError:
+            logger.error("Invalid JSON format in input_json")
+            raise ValueError("Invalid JSON format in input_json")
+
+        if 'text' not in data:
+            logger.error("Missing 'text' field in input_json")
+            raise ValueError("Missing 'text' field in input_json")
+
+        text = data['text']
+        emotion = data.get('emotion', 'neutral')
+
+        logger.debug(f"Synthesizing speech for text: '{text[:30]}...' with emotion: '{emotion}' (async)")
+
+        # Create speech config and synthesizer for this call (stateless, like in sync)
+        if self.endpoint and self.subscription_key:
+            speech_config = speechsdk.SpeechConfig(
+                subscription=self.subscription_key, endpoint=self.endpoint
+            )
+            speech_config.speech_synthesis_voice_name = self.voice_name
+            synthesizer = speechsdk.SpeechSynthesizer(
+                speech_config=speech_config, audio_config=None
+            )
+        else:
+            logger.error("SpeechSynthesizer is not initialized.")
+            raise RuntimeError("SpeechSynthesizer is not initialized.")
+
+        formatted_text = self.set_emotion(text, emotion)
+        loop = asyncio.get_event_loop()
+        result = await loop.run_in_executor(
+            None, lambda: synthesizer.speak_ssml_async(formatted_text).get()
+        )
+
+        if result.reason == speechsdk.ResultReason.SynthesizingAudioCompleted:
+            logger.debug("Speech synthesis completed successfully (async).")
+            return result.audio_data
+        elif result.reason == speechsdk.ResultReason.Canceled:
+            cancellation_details = result.cancellation_details
+            error_msg = f"Speech synthesis canceled: {cancellation_details.reason}"
+            if cancellation_details.reason == speechsdk.CancellationReason.Error:
+                error_msg += f" | ErrorCode: {cancellation_details.error_code}"
+                error_msg += f" | ErrorDetails: {cancellation_details.error_details}"
+                error_msg += "  | Check if speech resource key and endpoint are correct"
+            logger.error(error_msg)
+            raise RuntimeError(error_msg)
+        else:
+            logger.error(f"Speech synthesis failed: {result.reason}")
+            raise RuntimeError(f"Speech synthesis failed: {result.reason}")
     """
     Azure Cognitive Services Text-to-Speech provider with emotion support.
     """
@@ -52,64 +106,9 @@ class AzureTTSProvider(TTSProvider):
     def synthesize(self, input_json: str) -> bytes:
         """
         Convert input text and emotion data into synthesized speech audio.
-
-        Args:
-            input_json (str): JSON string containing text and optional emotion data
-
-        Returns:
-            bytes: Audio data in WAV format
-
-        Raises:
-            ValueError: If input_json is malformed or missing required fields
+        Now always uses the async implementation for performance, but keeps the sync interface.
         """
-        try:
-            data = json.loads(input_json)
-        except json.JSONDecodeError:
-            logger.error("Invalid JSON format in input_json")
-            raise ValueError("Invalid JSON format in input_json")
-
-        if 'text' not in data:
-            logger.error("Missing 'text' field in input_json")
-            raise ValueError("Missing 'text' field in input_json")
-
-        text = data['text']
-        emotion = data.get('emotion', 'neutral')
-
-        logger.debug(f"Synthesizing speech for text: '{text[:30]}...' with emotion: '{emotion}'")
-
-        # Create speech config - updated approach (2025)
-        if self.endpoint and self.subscription_key:
-            speech_config = speechsdk.SpeechConfig(
-                subscription=self.subscription_key, endpoint=self.endpoint
-            )
-
-        speech_config.speech_synthesis_voice_name = (
-            self.voice_name
-        )  # Create synthesizer with memory stream
-        synthesizer = speechsdk.SpeechSynthesizer(speech_config=speech_config, audio_config=None)
-
-        # Apply emotion and get formatted text (SSML)
-        formatted_text = self.set_emotion(text, emotion)
-
-        # Synthesize speech using the formatted text
-        result = synthesizer.speak_ssml_async(formatted_text).get()
-
-        # Check result status
-        if result.reason == speechsdk.ResultReason.SynthesizingAudioCompleted:
-            logger.debug("Speech synthesis completed successfully.")
-            return result.audio_data
-        elif result.reason == speechsdk.ResultReason.Canceled:
-            cancellation_details = result.cancellation_details
-            error_msg = f"Speech synthesis canceled: {cancellation_details.reason}"
-            if cancellation_details.reason == speechsdk.CancellationReason.Error:
-                error_msg += f" | ErrorCode: {cancellation_details.error_code}"
-                error_msg += f" | ErrorDetails: {cancellation_details.error_details}"
-                error_msg += "  | Check if speech resource key and endpoint are correct"
-            logger.error(error_msg)
-            raise RuntimeError(error_msg)
-        else:
-            logger.error(f"Speech synthesis failed: {result.reason}")
-            raise RuntimeError(f"Speech synthesis failed: {result.reason}")
+        return asyncio.run(self.synthesize_async(input_json))
 
     def set_emotion(self, text: str, emotion: str) -> str:
         """
