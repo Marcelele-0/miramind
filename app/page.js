@@ -1,9 +1,13 @@
+"use client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ArrowRight } from "lucide-react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 export default function Dashboard() {
+  const router = useRouter();
+
   return (
     <div className="flex justify-center items-center min-h-screen bg-[#d1bada]">
       <div className="grid grid-cols-5 grid-rows-3 gap-2 p-4 bg-[#d1bada] min-h-screen">
@@ -65,6 +69,7 @@ export default function Dashboard() {
               variant="ghost"
               size="icon"
               className="absolute bottom-2 right-2"
+              onClick={() => router.push("/call")}
             >
               <ArrowRight />
             </Button>
