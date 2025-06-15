@@ -32,7 +32,8 @@ dependencies = [
 ]
 
 [tool.setuptools.packages.find]
-where = ["src"]
+where = ["src/miramind",
+    "src/scripts"]
 
 [project.optional-dependencies]
 dev = [
@@ -43,5 +44,5 @@ dev = [
 ]
 
 # CLI entry point (if you want a command-line tool)
-# [project.scripts]
-# quiz = "quiz.main:main"
+[project.scripts]
+ytd = "downloader:main"
