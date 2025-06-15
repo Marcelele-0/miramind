@@ -10,3 +10,4 @@ dependencies:
       - mypy
       - pre-commit
       - azure-cognitiveservices-speech
+      - pytest
