@@ -9,3 +9,4 @@ dependencies:
       - python-dotenv
       - mypy
       - pre-commit
+      - azure-cognitiveservices-speech

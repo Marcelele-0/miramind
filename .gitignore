@@ -44,10 +44,15 @@ transcripts/
 
 # === Credentials / secrets ===
 .env
-.env.*
+.env.local
+.env.production
+.env.staging
 secrets.json
 *.key
 *.pem
+
+# Allow .env.example
+!.env.example
 
 # === LangGraph states / temp ===
 *.jsonl
