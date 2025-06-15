@@ -26,9 +26,13 @@ classifiers = [
 ]
 
 dependencies = [
-    # Current minimal dependencies (matching environment.yaml)
     "python-dotenv>=1.0.0",
+    "openai",
+    "pytubefix"
 ]
+
+[tool.setuptools.packages.find]
+where = ["src"]
 
 [project.optional-dependencies]
 dev = [
@@ -37,3 +41,7 @@ dev = [
     "black>=23.0.0",
     "pre-commit",
 ]
+
+# CLI entry point (if you want a command-line tool)
+# [project.scripts]
+# quiz = "quiz.main:main"
