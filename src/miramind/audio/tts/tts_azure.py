@@ -1,7 +1,7 @@
 import json
 import azure.cognitiveservices.speech as speechsdk
-from typing import Any, Dict, Callable
-from miramind.audio.tts.tts_base import TTSProvider
+from typing import Any
+from tts_base import TTSProvider
 
 
 class AzureTTSProvider(TTSProvider):
@@ -160,37 +160,3 @@ class AzureTTSProvider(TTSProvider):
         '''
 
         return ssml.strip()
-
-
-# Updated factory function with endpoint support
-def get_tts_provider(name: str = "azure") -> TTSProvider:
-    """
-    Create and return a TTS provider instance based on the specified name.
-
-    Args:
-        name (str): The name of the TTS provider to create (default: "azure")
-
-    Returns:
-        TTSProvider: An instance of the requested TTS provider
-
-    Raises:
-        ValueError: If the specified provider name is not supported
-    """
-    provider_registry: Dict[str, Callable[[], TTSProvider]] = {
-        "azure": lambda: AzureTTSProvider(
-            # Option 1: Using endpoint (recommended 2025 approach)
-            endpoint="YOUR_AZURE_ENDPOINT",  # e.g., "https://YOUR_REGION.api.cognitive.microsoft.com/"
-            subscription_key="YOUR_AZURE_KEY",  # Optional with endpoint
-            # Option 2: Traditional approach (still supported)
-            # subscription_key="YOUR_AZURE_KEY",
-            # region="YOUR_AZURE_REGION"
-        )
-    }
-
-    if name not in provider_registry:
-        supported_providers = ", ".join(provider_registry.keys())
-        raise ValueError(
-            f"Unknown TTS provider: '{name}'. " f"Supported providers: {supported_providers}"
-        )
-
-    return provider_registry[name]()
