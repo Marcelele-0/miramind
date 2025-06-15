@@ -17,7 +17,7 @@ def download_yt_audio(url, name="test-audio"):
     ys = yt.streams.get_audio_only()
     test_dir = f"{os.environ['TESTS_DIR']}/stt"
     logging.debug(test_dir)
-    ys.download(f"{os.environ['TESTS_DIR']}\\stt")
+    ys.download(f"{os.environ['TESTS_DIR']}/stt")
 
 
 def main():

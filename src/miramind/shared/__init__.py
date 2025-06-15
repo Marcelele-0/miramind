@@ -1,6 +1,42 @@
 from openai import AzureOpenAI
 from dotenv import load_dotenv
 import os
+import logging
+
+
+logging.basicConfig(level=logging.ERROR)
+
+
+class s:
+    pass
+
+S = s()
+
+
+class a:
+    pass
+
+A = a()
+
+
+class u:
+    pass
+
+U = u()
+
+
+def msg(role, message):
+    role_str = None
+    if isinstance(role, s):
+        role_str = "system"
+    elif isinstance(role, a):
+        role_str = "assistant"
+    elif isinstance(role, u):
+        role_str = "user"
+
+    return_val = {"role": role_str, "content": message}
+    logging.info(return_val)
+    return return_val
 
 
 class MyClient:
