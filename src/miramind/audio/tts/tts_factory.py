@@ -1,8 +1,8 @@
 import os
 from typing import Dict, Callable
 from dotenv import load_dotenv
-from tts_base import TTSProvider
-from tts_azure import AzureTTSProvider
+from .tts_base import TTSProvider
+from .tts_azure import AzureTTSProvider
 
 # Load environment variables
 load_dotenv()

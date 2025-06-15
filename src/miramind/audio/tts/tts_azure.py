@@ -1,7 +1,7 @@
 import json
 import azure.cognitiveservices.speech as speechsdk
 from typing import Any
-from tts_base import TTSProvider
+from .tts_base import TTSProvider
 
 
 class AzureTTSProvider(TTSProvider):
