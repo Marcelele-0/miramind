@@ -6,15 +6,24 @@
 
 #### src/miramind/stt
 
-#### src/miramind/shared
+- STT.transcribe(file) -> dict: returns dictionaty with "transcript" and "language" keywords. 
 
-##### MyClient
+#### src/miramind/shared
  
- - get() -> AzureOpenAi: (static method) returns AzureOpenAI client.
+ - Myclient.get() -> AzureOpenAi: returns AzureOpenAI client.
 
  ``` python
 client = MyClient.get()
  ```
+
+ - msg(role, message) -> dict: returns dictionary with "role" and "contnent" keywords. role argument should be one of S, U, A constants.
+``` python
+messages = [msg(S, "system prompt"),
+            msg(A, "assistnar response"),
+            msg(U, "user input")]
+print(messages)
+# [{'role': 'system', 'content': 'system prompt'}, {'role': 'assistant', 'content': 'assistnar response'}, {'role': 'user', 'content': 'user input'}]
+```
 
 ### src/scripts
 
