@@ -9,3 +9,5 @@ dependencies:
       - python-dotenv
       - mypy
       - pre-commit
+      - openai
+      - pytubefix
