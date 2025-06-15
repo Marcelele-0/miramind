@@ -1,8 +1,14 @@
+import os
 from typing import Dict, Callable
-from miramind.audio.tts.tts_base import TTSProvider
+from dotenv import load_dotenv
+from tts_base import TTSProvider
+from tts_azure import AzureTTSProvider
+
+# Load environment variables
+load_dotenv()
 
 
-def get_tts_provider(name: str = None) -> TTSProvider:
+def get_tts_provider(name: str = "azure") -> TTSProvider:
     """
     Create and return a TTS provider instance based on the specified name.
 
@@ -11,7 +17,7 @@ def get_tts_provider(name: str = None) -> TTSProvider:
     client code.
 
     Args:
-        name (str, optional): The name of the TTS provider to create.
+        name (str): The name of the TTS provider to create (default: "azure")
 
     Returns:
         TTSProvider: An instance of the requested TTS provider
@@ -21,10 +27,17 @@ def get_tts_provider(name: str = None) -> TTSProvider:
 
     Example:
         >>> json_input = '{"text": "Hello world", "emotion": "happy"}'
-        >>> provider = get_tts_provider()
+        >>> provider = get_tts_provider("azure")
         >>> audio = provider.synthesize(json_input)
     """
-    provider_registry: Dict[str, Callable[[], TTSProvider]] = {}
+    provider_registry: Dict[str, Callable[[], TTSProvider]] = {
+        "azure": lambda: AzureTTSProvider(
+            # Using environment variables from .env file
+            endpoint=os.getenv("AZURE_SPEECH_ENDPOINT"),
+            subscription_key=os.getenv("AZURE_SPEECH_KEY"),
+            voice_name=os.getenv("AZURE_SPEECH_VOICE_NAME", "en-US-JennyNeural")
+        )
+    }
 
     if name not in provider_registry:
         supported_providers = ", ".join(provider_registry.keys())
