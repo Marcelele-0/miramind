@@ -11,13 +11,12 @@ class STT:
     def __init__(self):
         self.client = MyClient.get()
 
-    def transcribe(self, file):
+    def transcribe(self, file) -> dict[str: str]:
         load_dotenv()
         with open(file, "rb") as audio_file:
             transcript = self.client.audio.transcriptions.create(model=os.environ.get("STT_DEPLOYMENT", "gpt-4o-transcribe"),
                                                                  file=audio_file,
-                                                                 response_format="json",
-                                                                 timestamp_granularities=["word"])
+                                                                 response_format="json",)
             
         messages = [msg(S, "Detect language of the following text. Your answer should be one word. Example: english, polish, german."),
                     msg(S, f"Text: {transcript.text}")]
