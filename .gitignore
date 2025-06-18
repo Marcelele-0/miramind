@@ -110,3 +110,6 @@ cache/
 # === Analytics / telemetry ===
 emotion_trends/
 user_insights/
+
+# === Temp dirs ===
+temp/sttr_temp/
