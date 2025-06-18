@@ -33,6 +33,9 @@ dependencies = [
     "azure-cognitiveservices-speech>=1.34.0",
     # pytest for tests
     "pytest"
+    "sounddevice",
+    "scipy",
+    "soundfile"
 ]
 
 [tool.setuptools.packages.find]
