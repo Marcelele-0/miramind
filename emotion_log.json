@@ -1,0 +1,64 @@
+[
+  {
+    "input": "I want to hide under my bed",
+    "emotion": "scared"
+  },
+  {
+    "input": "the kids in school had fun of me! I hate them",
+    "emotion": "angry"
+  },
+  {
+    "input": "I dont want to talk to adults! Other kids will say that im a sneak",
+    "emotion": "anxious"
+  },
+  {
+    "input": "i dont want to talk to anyone",
+    "emotion": "sad"
+  },
+  {
+    "input": "why do i feel like that?",
+    "emotion": "anxious"
+  },
+  {
+    "input": "I am nervous i have presentation today, and last time kids had fun of me",
+    "emotion": "anxious"
+  },
+  {
+    "input": "Im mad at my teacher",
+    "emotion": "angry"
+  },
+  {
+    "input": "She was mean to me",
+    "emotion": "angry"
+  },
+  {
+    "input": "i feel like nobody can understand me",
+    "emotion": "sad",
+    "confidence": 0.88
+  },
+  {
+    "input": "i dont want to talk to anyone",
+    "emotion": "angry",
+    "confidence": 0.85
+  },
+  {
+    "input": "my name is adam",
+    "emotion": "neutral",
+    "confidence": 0.85
+  },
+  {
+    "input": "what is my name",
+    "emotion": "neutral",
+    "confidence": 0.85
+  },
+  {
+    "input": "my name is adam",
+    "emotion": "neutral",
+    "confidence": 0.95
+  },
+  {
+    "input": "what is my name",
+    "emotion": "neutral",
+    "confidence": 0.88
+  }
+]
