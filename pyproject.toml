@@ -28,7 +28,10 @@ classifiers = [
 dependencies = [
     "python-dotenv>=1.0.0",
     "openai",
-    "pytubefix"
+    "pytubefix",
+    "sounddevice",
+    "scipy",
+    "soundfile"
 ]
 
 [tool.setuptools.packages.find]
