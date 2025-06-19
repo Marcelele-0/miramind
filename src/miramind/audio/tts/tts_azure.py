@@ -1,6 +1,5 @@
 import json
 import azure.cognitiveservices.speech as speechsdk
-from typing import Any
 from .tts_base import TTSProvider
 
 
@@ -11,9 +10,8 @@ class AzureTTSProvider(TTSProvider):
 
     def __init__(
         self,
-        subscription_key: str = None,
-        region: str = None,
-        endpoint: str = None,
+        subscription_key: str,
+        endpoint: str,
         voice_name: str = "en-US-JennyNeural",
     ):
         """
@@ -21,19 +19,14 @@ class AzureTTSProvider(TTSProvider):
 
         Args:
             subscription_key (str, optional): Azure Cognitive Services subscription key
-            region (str, optional): Azure region (e.g., 'eastus', 'westeurope')
             endpoint (str, optional): Azure Speech service endpoint URL
             voice_name (str): Voice to use (default: en-US-JennyNeural - supports 14+ emotion styles as of Feb 2025)
-
-        Note: Either (subscription_key + region) OR endpoint must be provided
         """
         self.subscription_key = subscription_key
-        self.region = region
         self.endpoint = endpoint
         self.voice_name = voice_name
 
-        # Updated emotion mapping for Azure Neural Voices (Feb 2025)
-        # JennyNeural now supports 14 emotion styles + general
+        # Define emotion styles mapping
         self.emotion_styles = {
             'angry': 'angry',
             'assistant': 'assistant',
@@ -78,34 +71,23 @@ class AzureTTSProvider(TTSProvider):
         emotion = data.get('emotion', 'neutral')
 
         # Create speech config - updated approach (2025)
-        if self.endpoint:
-            # Using endpoint (recommended for 2025)
+        if self.endpoint and self.subscription_key:
             speech_config = speechsdk.SpeechConfig(
-                endpoint=self.endpoint, subscription=self.subscription_key
-            )
-        else:
-            # Fallback to subscription + region
-            if not self.subscription_key or not self.region:
-                raise ValueError("Either endpoint OR (subscription_key + region) must be provided")
-            speech_config = speechsdk.SpeechConfig(
-                subscription=self.subscription_key, region=self.region
+                subscription=self.subscription_key, endpoint=self.endpoint
             )
 
-        speech_config.speech_synthesis_voice_name = self.voice_name
-
-        # Create synthesizer with memory stream
+        speech_config.speech_synthesis_voice_name = (
+            self.voice_name
+        )  # Create synthesizer with memory stream
         synthesizer = speechsdk.SpeechSynthesizer(speech_config=speech_config, audio_config=None)
 
-        # Apply emotion and synthesize
-        self.set_emotion(synthesizer, emotion)
+        # Apply emotion and get formatted text (SSML)
+        formatted_text = self.set_emotion(text, emotion)
 
-        # Create SSML with emotion style
-        ssml = self._create_ssml(text, emotion)
+        # Synthesize speech using the formatted text
+        result = synthesizer.speak_ssml_async(formatted_text).get()
 
-        # Synthesize speech
-        result = synthesizer.speak_ssml_async(ssml).get()
-
-        # Handle results like in C# example
+        # Check result status
         if result.reason == speechsdk.ResultReason.SynthesizingAudioCompleted:
             return result.audio_data
         elif result.reason == speechsdk.ResultReason.Canceled:
@@ -114,29 +96,36 @@ class AzureTTSProvider(TTSProvider):
             if cancellation_details.reason == speechsdk.CancellationReason.Error:
                 error_msg += f" | ErrorCode: {cancellation_details.error_code}"
                 error_msg += f" | ErrorDetails: {cancellation_details.error_details}"
-                error_msg += " | Check if speech resource key and endpoint are correct"
+                error_msg += "  | Check if speech resource key and endpoint are correct"
             raise RuntimeError(error_msg)
         else:
             raise RuntimeError(f"Speech synthesis failed: {result.reason}")
 
-    def set_emotion(self, engine: Any, emotion: str) -> None:
+    def set_emotion(self, text: str, emotion: str) -> str:
         """
-        Configure the TTS engine to reflect the specified emotion.
-        Note: For Azure TTS, emotion is applied via SSML, not engine configuration.
+        Apply emotion to text and return SSML markup with emotion styling.
 
         Args:
-            engine (Any): The Azure SpeechSynthesizer instance
+            text (str): The original text to synthesize
             emotion (str): The emotion to apply
+
+        Returns:
+            str: SSML markup with emotion styling applied
+
+        Raises:
+            ValueError: If emotion is not supported
         """
-        # Azure emotions are applied via SSML, so this method serves as validation
+        # Validate emotion
         if emotion not in self.emotion_styles:
             available_emotions = ", ".join(self.emotion_styles.keys())
             raise ValueError(f"Unsupported emotion: '{emotion}'. Available: {available_emotions}")
 
+        # Return formatted SSML
+        return self._create_ssml(text, emotion)
+
     def _create_ssml(self, text: str, emotion: str) -> str:
         """
         Create SSML markup with emotion styling.
-        Updated for Feb 2025 Azure AI Speech changes.
 
         Args:
             text (str): Text to synthesize
@@ -147,7 +136,7 @@ class AzureTTSProvider(TTSProvider):
         """
         style = self.emotion_styles.get(emotion, 'general')
 
-        # Updated SSML format for Azure AI Speech (2025)
+        # Support for correct SSML structure
         ssml = f'''
         <speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis"
                xmlns:mstts="https://www.w3.org/2001/mstts" xml:lang="en-US">
