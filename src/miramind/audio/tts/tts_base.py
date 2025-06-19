@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-from typing import Any
 
 
 class TTSProvider(ABC):
@@ -26,15 +25,23 @@ class TTSProvider(ABC):
         pass
 
     @abstractmethod
-    def set_emotion(self, engine: Any, emotion: str) -> None:
+    def set_emotion(self, text: str, emotion: str) -> str:
         """
-        Configure the TTS engine to reflect the specified emotion.
+        Apply emotion to text and return properly formatted text for synthesis.
+
+        This method should handle emotion application in a provider-specific way:
+        - For SSML-based providers (Azure): return SSML markup with emotion tags
+        - For other providers: return modified text or configuration string
 
         Args:
-            engine (Any): The TTS engine instance to configure
+            text (str): The original text to synthesize
             emotion (str): The emotion to apply (e.g., 'happy', 'sad', 'neutral')
 
+        Returns:
+            str: Formatted text ready for synthesis (SSML, modified text, etc.)
+
         Raises:
+            ValueError: If emotion is not supported by the provider
             NotImplementedError: If the method is not implemented by subclass
         """
         pass

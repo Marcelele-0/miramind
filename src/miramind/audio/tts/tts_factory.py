@@ -4,9 +4,6 @@ from dotenv import load_dotenv
 from .tts_base import TTSProvider
 from .tts_azure import AzureTTSProvider
 
-# Load environment variables
-load_dotenv()
-
 
 def get_tts_provider(name: str = "azure") -> TTSProvider:
     """
@@ -18,6 +15,7 @@ def get_tts_provider(name: str = "azure") -> TTSProvider:
 
     Args:
         name (str): The name of the TTS provider to create (default: "azure")
+        currently_supported: "azure"
 
     Returns:
         TTSProvider: An instance of the requested TTS provider
@@ -30,12 +28,16 @@ def get_tts_provider(name: str = "azure") -> TTSProvider:
         >>> provider = get_tts_provider("azure")
         >>> audio = provider.synthesize(json_input)
     """
+
+    # Load environment variables
+    load_dotenv()
+
     provider_registry: Dict[str, Callable[[], TTSProvider]] = {
         "azure": lambda: AzureTTSProvider(
             # Using environment variables from .env file
             endpoint=os.getenv("AZURE_SPEECH_ENDPOINT"),
             subscription_key=os.getenv("AZURE_SPEECH_KEY"),
-            voice_name=os.getenv("AZURE_SPEECH_VOICE_NAME", "en-US-JennyNeural")
+            voice_name=os.getenv("AZURE_SPEECH_VOICE_NAME", "en-US-JennyNeural"),
         )
     }
 
