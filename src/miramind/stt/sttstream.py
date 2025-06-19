@@ -21,6 +21,17 @@ stt_stream_logger.setLevel(logging.INFO)
 load_dotenv()
 
 
+class SentinelLogger():
+    def debug(self, *args):
+        pass
+
+    def info(self, *args):
+        pass
+
+
+SENTINEL_LOGGER = SentinelLogger()
+
+
 def get_short_uuid():
     u = uuid.uuid4()
     return base64.urlsafe_b64encode(u.bytes).rstrip(b'=').decode('ascii')
@@ -45,7 +56,7 @@ class RecordingStream:
         return self.stop_flag
 
     @staticmethod
-    def record(path: str = "output.wav", settings: dict = None, verbose: bool = False):
+    def record(path: str = "output.wav", settings: dict = None, verbose: bool = False, logger: logging.Logger = SENTINEL_LOGGER):
         if settings is None:
             settings = {}
         duration = settings.get("duration", 3)
@@ -53,21 +64,23 @@ class RecordingStream:
 
         if verbose:
             print("Recording...")
+        logger.info("Recording...")
+        t = time.time()
         audio = sd.rec(int(duration * sample_rate), samplerate=sample_rate, channels=2)
         sd.wait()
-
+        logger.info(f"Recording completed. Time elapsed {time.time() - t}")
+        logger.info("Saving...")
+        t = time.time()
         write(path, sample_rate, audio)
+        logger.info(f"Saving completed. Time elapsed: {time.time() - t}")
         if verbose:
             print(f"Recording saved to {path}")
     
     def run(self, **kwargs):
         while not self.stop_flag.is_set():
-            t = time.time()
             path = f"{self.temp_dir}/{get_short_uuid()}.wav"
-            rec_stream_logger.info("Recording...")
-            self.record(path=path, settings=kwargs)
+            self.record(path=path, settings=kwargs, logger=rec_stream_logger)
             self.file_queue.put(path)
-            rec_stream_logger.info(f"Recording completed. Time elapsec: {time.time() - t}.")
 
 
 class STTStream:
@@ -158,7 +171,7 @@ def test2():
     stt_stream = STTStream(target_queue=rec_stream.get_queue())
     buffer = stt_stream.get_buffer()
 
-    rec_thread = threading.Thread(target=rec_stream.run, kwargs={"duration": 10})
+    rec_thread = threading.Thread(target=rec_stream.run, kwargs={"duration": 3})
     stt_thread = threading.Thread(target=stt_stream.run)
 
     rec_flag = rec_stream.get_stop_flag()
@@ -167,7 +180,7 @@ def test2():
     rec_thread.start()
     stt_thread.start()
 
-    time.sleep(11)
+    time.sleep(10)
     rec_flag.set()
     stt_flag.set()
 

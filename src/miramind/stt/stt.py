@@ -1,8 +1,6 @@
-from shared import MyClient, S, A, U, msg
+from shared import MyClient, S, msg
 from dotenv import load_dotenv
 import os
-import sounddevice as sd
-from scipy.io.wavfile import write
 
 
 class STT:
@@ -32,6 +30,6 @@ class STT:
 if __name__ == "__main__":
     load_dotenv()
     my_stt = STT()
-    t = my_stt.transcribe_file(f"{os.environ["TESTS_DIR"]}/stt/rick_roll.m4a", response_format="json")
+    t = my_stt.transcribe(f"{os.environ['TESTS_DIR']}/stt/rick_roll.m4a")
     print(t)
     
