@@ -1,8 +1,10 @@
 import os
-from typing import Dict, Callable
+from typing import Callable, Dict
+
 from dotenv import load_dotenv
-from .tts_base import TTSProvider
+
 from .tts_azure import AzureTTSProvider
+from .tts_base import TTSProvider
 
 
 def get_tts_provider(name: str = "azure") -> TTSProvider:

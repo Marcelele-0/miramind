@@ -1,13 +1,14 @@
-import pytest
 import json
 import os
 import sys
 
+import pytest
+
 # Add src to path for imports
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", "..", ".."))
 
-from src.miramind.audio.tts.tts_factory import get_tts_provider
 from src.miramind.audio.tts.tts_base import TTSProvider
+from src.miramind.audio.tts.tts_factory import get_tts_provider
 
 
 class TestTTSIntegration:
@@ -20,10 +21,10 @@ class TestTTSIntegration:
             mp.setenv("AZURE_SPEECH_ENDPOINT", "https://test.api.cognitive.microsoft.com/")
             mp.setenv("AZURE_SPEECH_KEY", "test_key_12345")
             mp.setenv("AZURE_SPEECH_VOICE_NAME", "en-US-JennyNeural")
-            
+
             # Factory should create provider without errors
             provider = get_tts_provider("azure")
-            
+
             # Basic functionality checks
             assert provider is not None
             assert isinstance(provider, TTSProvider)
@@ -37,15 +38,14 @@ class TestTTSIntegration:
         with pytest.MonkeyPatch().context() as mp:
             mp.setenv("AZURE_SPEECH_ENDPOINT", "https://test.api.cognitive.microsoft.com/")
             mp.setenv("AZURE_SPEECH_KEY", "test_key_12345")
-            
+
             provider = get_tts_provider("azure")
-            
+
             # Valid JSON input
-            test_input = json.dumps({
-                "text": "Hello, this is a test message!",
-                "emotion": "cheerful"
-            })
-            
+            test_input = json.dumps(
+                {"text": "Hello, this is a test message!", "emotion": "cheerful"}
+            )
+
             # Should not raise an exception during parsing
             try:
                 provider.synthesize(test_input)
@@ -60,9 +60,9 @@ class TestTTSIntegration:
         with pytest.MonkeyPatch().context() as mp:
             mp.setenv("AZURE_SPEECH_ENDPOINT", "https://test.api.cognitive.microsoft.com/")
             mp.setenv("AZURE_SPEECH_KEY", "test_key_12345")
-            
+
             provider = get_tts_provider("azure")
-            
+
             # Invalid JSON should raise ValueError
             with pytest.raises(ValueError, match="Invalid JSON"):
                 provider.synthesize("not valid json")
@@ -72,9 +72,9 @@ class TestTTSIntegration:
         with pytest.MonkeyPatch().context() as mp:
             mp.setenv("AZURE_SPEECH_ENDPOINT", "https://test.api.cognitive.microsoft.com/")
             mp.setenv("AZURE_SPEECH_KEY", "test_key_12345")
-            
+
             provider = get_tts_provider("azure")
-            
+
             # JSON without 'text' field should raise ValueError
             invalid_input = json.dumps({"emotion": "happy"})
             with pytest.raises(ValueError, match="Missing 'text' field"):
@@ -85,18 +85,15 @@ class TestTTSIntegration:
         with pytest.MonkeyPatch().context() as mp:
             mp.setenv("AZURE_SPEECH_ENDPOINT", "https://test.api.cognitive.microsoft.com/")
             mp.setenv("AZURE_SPEECH_KEY", "test_key_12345")
-            
+
             provider = get_tts_provider("azure")
-            
+
             # Test different emotions
             emotions_to_test = ["cheerful", "sad", "excited", "neutral", "angry"]
-            
+
             for emotion in emotions_to_test:
-                test_input = json.dumps({
-                    "text": f"Testing {emotion} emotion",
-                    "emotion": emotion
-                })
-                
+                test_input = json.dumps({"text": f"Testing {emotion} emotion", "emotion": emotion})
+
                 try:
                     provider.synthesize(test_input)
                 except ValueError as e:
@@ -110,7 +107,7 @@ class TestTTSIntegration:
         """Test that factory properly handles unknown providers."""
         with pytest.raises(ValueError, match="Unknown TTS provider"):
             get_tts_provider("nonexistent_provider")
-        
+
         # Should list available providers in error message
         with pytest.raises(ValueError, match="Supported providers"):
             get_tts_provider("invalid")
@@ -125,14 +122,14 @@ class TestTTSIntegration:
         test_endpoint = "https://custom.api.cognitive.microsoft.com/"
         test_key = "custom_test_key_789"
         test_voice = "en-US-AriaNeural"
-        
+
         with pytest.MonkeyPatch().context() as mp:
             mp.setenv("AZURE_SPEECH_ENDPOINT", test_endpoint)
             mp.setenv("AZURE_SPEECH_KEY", test_key)
             mp.setenv("AZURE_SPEECH_VOICE_NAME", test_voice)
-            
+
             provider = get_tts_provider("azure")
-            
+
             # Check that provider uses environment variables
             assert provider.endpoint == test_endpoint
             assert provider.subscription_key == test_key
