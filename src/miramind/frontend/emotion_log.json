@@ -1,0 +1,102 @@
+[
+  {
+    "input": "im scared that main is needed",
+    "emotion": "scared",
+    "confidence": 0.87
+  },
+  {
+    "input": "i want to run away",
+    "emotion": "angry",
+    "confidence": 0.88
+  },
+  {
+    "input": "i want to run away",
+    "emotion": "scared",
+    "confidence": 0.87
+  },
+  {
+    "input": "i want to run away",
+    "emotion": "scared",
+    "confidence": 0.88
+  },
+  {
+    "input": "im excited for next day",
+    "emotion": "excited",
+    "confidence": 0.95
+  },
+  {
+    "input": "im excited for the next day",
+    "emotion": "excited",
+    "confidence": 0.95
+  },
+  {
+    "input": "i dont want to be here",
+    "emotion": "sad",
+    "confidence": 0.85
+  },
+  {
+    "input": "undefined",
+    "emotion": "neutral",
+    "confidence": 0.0
+  },
+  {
+    "input": "undefined",
+    "emotion": "neutral",
+    "confidence": 0.0
+  },
+  {
+    "input": "undefined",
+    "emotion": "neutral",
+    "confidence": 0.0
+  },
+  {
+    "input": "undefined",
+    "emotion": "neutral",
+    "confidence": 0.0
+  },
+  {
+    "input": "undefined",
+    "emotion": "neutral",
+    "confidence": 0.0
+  },
+  {
+    "input": "undefined",
+    "emotion": "neutral",
+    "confidence": 0.0
+  },
+  {
+    "input": "undefined",
+    "emotion": "neutral",
+    "confidence": 0.0
+  },
+  {
+    "input": "undefined",
+    "emotion": "neutral",
+    "confidence": 0.0
+  },
+  {
+    "input": "undefined",
+    "emotion": "neutral",
+    "confidence": 0.0
+  },
+  {
+    "input": "can you hear me?",
+    "emotion": "neutral",
+    "confidence": 0.85
+  },
+  {
+    "input": "can anybody hear me?",
+    "emotion": "anxious",
+    "confidence": 0.76
+  },
+  {
+    "input": "im excited for tomorrow",
+    "emotion": "excited",
+    "confidence": 0.95
+  },
+  {
+    "input": "i feel overwhelmed",
+    "emotion": "anxious",
+    "confidence": 0.95
+  }
+]
