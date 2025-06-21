@@ -7,6 +7,7 @@ def get_language_detection_prompt(text):
     """
     Hardcoded prompt for language detection.
     """
+
     return [msg(S, "Detect language of the following text. Your answer should be one word. Example: english, polish, german."),
             msg(S, f"Text: {text}")]
 
@@ -18,21 +19,28 @@ class STT:
     Attributes:
         client: client instance used for API calls.
     """
-    client = MyClient.get()
 
-    """
-        Transcribes an audio file and detects the language of the transcript.
+    def __init__(self):
+        """
+        Constructor of STT class.
+        """
+        
+        self.client = MyClient.get()
 
-        Args:
-            file (str): Path to the audio file to be transcribed.
-
-        Returns:
-            dict[str, str]: A dictionary containing the detected language and the transcribed text.
-                            Keys are:
-                                - 'language': The detected language (e.g., 'english', 'german').
-                                - 'transcript': The transcribed text from the audio.
-    """
     def transcribe(self, file_path: str) -> dict[str: str]:
+        """
+            Transcribes an audio file and detects the language of the transcript.
+
+            Args:
+                file_path (str): Path to the audio file to be transcribed.
+
+            Returns:
+                dict[str, str]: A dictionary containing the detected language and the transcribed text.
+                                Keys are:
+                                    - 'language': The detected language (e.g., 'english', 'german').
+                                    - 'transcript': The transcribed text from the audio.
+        """
+
         load_dotenv()
         with open(file_path, "rb") as audio_file:
             transcript = self.client.audio.transcriptions.create(model=os.environ.get("STT_DEPLOYMENT", "gpt-4o-_transcribe"),

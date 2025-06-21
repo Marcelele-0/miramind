@@ -1,7 +1,6 @@
 from openai import AzureOpenAI
 from dotenv import load_dotenv
 import os
-import logging
 
 
 class s:
@@ -32,7 +31,6 @@ def msg(role, message):
         role_str = "user"
 
     return_val = {"role": role_str, "content": message}
-    logging.info(return_val)
     return return_val
 
 
