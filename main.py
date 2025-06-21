@@ -1,9 +1,15 @@
+import time
 import logging
-from stt.sttstream import RecordingStream
+
+t = time.time()
+from stt.stt_stream import RecordingStream
+print(f'Import time: {time.time() - t}')
 
 if __name__ == "__main__":
-    logger = logging.getLogger("My logger")
+    logging.basicConfig(level=logging.INFO)
+    t = time.time()
+    logger = logging.getLogger("My_logger")
     logger.setLevel(logging.INFO)
     logger.info("start")
-    print("kkkk")
-    RecordingStream.record(settings={"duration": 10}, logger=logger)
+    RecordingStream.record(logger=logger, duration=10)
+    print(f'Execution time: {time.time() - t}')
