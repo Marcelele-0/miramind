@@ -1,0 +1,52 @@
+[
+  {
+    "input": "i want to see Anna tomorrow",
+    "emotion": "excited",
+    "confidence": 0.87
+  },
+  {
+    "input": "my name is adam",
+    "emotion": "neutral",
+    "confidence": 0.95
+  },
+  {
+    "input": "what is my name?",
+    "emotion": "neutral",
+    "confidence": 0.95
+  },
+  {
+    "input": "what is my name?",
+    "emotion": "neutral",
+    "confidence": 0.85
+  },
+  {
+    "input": "my name is adam",
+    "emotion": "neutral",
+    "confidence": 0.99
+  },
+  {
+    "input": "what is my name?",
+    "emotion": "neutral",
+    "confidence": 0.99
+  },
+  {
+    "input": "my name is adam",
+    "emotion": "neutral",
+    "confidence": 0.95
+  },
+  {
+    "input": "what is my name?",
+    "emotion": "neutral",
+    "confidence": 0.88
+  },
+  {
+    "input": "my best friend is Rafael",
+    "emotion": "neutral",
+    "confidence": 0.86
+  },
+  {
+    "input": "what is my best friend name?",
+    "emotion": "neutral",
+    "confidence": 0.85
+  }
+]

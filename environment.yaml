@@ -11,4 +11,9 @@ dependencies:
       - pre-commit
       - azure-cognitiveservices-speech
       - pytest
-      - isort
+      - langchain
+      - langgraph
+      - soundfile
+      - torchaudio
+      - torch
+      - tqdm
