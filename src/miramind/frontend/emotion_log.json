@@ -1,0 +1,217 @@
+[
+  {
+    "input": "im scared that main is needed",
+    "emotion": "scared",
+    "confidence": 0.87
+  },
+  {
+    "input": "i want to run away",
+    "emotion": "angry",
+    "confidence": 0.88
+  },
+  {
+    "input": "i want to run away",
+    "emotion": "scared",
+    "confidence": 0.87
+  },
+  {
+    "input": "i want to run away",
+    "emotion": "scared",
+    "confidence": 0.88
+  },
+  {
+    "input": "im excited for next day",
+    "emotion": "excited",
+    "confidence": 0.95
+  },
+  {
+    "input": "im excited for the next day",
+    "emotion": "excited",
+    "confidence": 0.95
+  },
+  {
+    "input": "i dont want to be here",
+    "emotion": "sad",
+    "confidence": 0.85
+  },
+  {
+    "input": "undefined",
+    "emotion": "neutral",
+    "confidence": 0.0
+  },
+  {
+    "input": "undefined",
+    "emotion": "neutral",
+    "confidence": 0.0
+  },
+  {
+    "input": "undefined",
+    "emotion": "neutral",
+    "confidence": 0.0
+  },
+  {
+    "input": "undefined",
+    "emotion": "neutral",
+    "confidence": 0.0
+  },
+  {
+    "input": "undefined",
+    "emotion": "neutral",
+    "confidence": 0.0
+  },
+  {
+    "input": "undefined",
+    "emotion": "neutral",
+    "confidence": 0.0
+  },
+  {
+    "input": "undefined",
+    "emotion": "neutral",
+    "confidence": 0.0
+  },
+  {
+    "input": "undefined",
+    "emotion": "neutral",
+    "confidence": 0.0
+  },
+  {
+    "input": "undefined",
+    "emotion": "neutral",
+    "confidence": 0.0
+  },
+  {
+    "input": "can you hear me?",
+    "emotion": "neutral",
+    "confidence": 0.85
+  },
+  {
+    "input": "can anybody hear me?",
+    "emotion": "anxious",
+    "confidence": 0.76
+  },
+  {
+    "input": "im excited for tomorrow",
+    "emotion": "excited",
+    "confidence": 0.95
+  },
+  {
+    "input": "i feel overwhelmed",
+    "emotion": "anxious",
+    "confidence": 0.95
+  },
+  {
+    "input": "i want to hide under my bed",
+    "emotion": "scared",
+    "confidence": 0.85
+  },
+  {
+    "input": "I want to run away",
+    "emotion": "anxious",
+    "confidence": 0.88
+  },
+  {
+    "input": "but you are the only one to listen ",
+    "emotion": "sad",
+    "confidence": 0.85
+  },
+  {
+    "input": "i feel good",
+    "emotion": "happy",
+    "confidence": 0.85
+  },
+  {
+    "input": "im feeling down",
+    "emotion": "sad",
+    "confidence": 0.95
+  },
+  {
+    "input": "i want to hide under my bed",
+    "emotion": "scared",
+    "confidence": 0.95
+  },
+  {
+    "input": "i dont feel like anybody understand me",
+    "emotion": "sad",
+    "confidence": 0.87
+  },
+  {
+    "input": "i could not sleep last night",
+    "emotion": "anxious",
+    "confidence": 0.87
+  },
+  {
+    "input": "i cant wait to see Anna tomorrow",
+    "emotion": "neutral",
+    "confidence": 0.0
+  },
+  {
+    "input": "I cant wait to see Anna tomorrow",
+    "emotion": "neutral",
+    "confidence": 0.0
+  },
+  {
+    "input": "not working?",
+    "emotion": "neutral",
+    "confidence": 0.0
+  },
+  {
+    "input": "i want to see Mathew tomorrow",
+    "emotion": "neutral",
+    "confidence": 0.85
+  },
+  {
+    "input": "he is my friend i sometimes i feel like only he can understand me ",
+    "emotion": "neutral",
+    "confidence": 0.88
+  },
+  {
+    "input": "What is his name?",
+    "emotion": "neutral",
+    "confidence": 0.95
+  },
+  {
+    "input": "i cant wait to see Rafael tomorrow",
+    "emotion": "excited",
+    "confidence": 0.95
+  },
+  {
+    "input": "He is my best friend, we have just great vibe together ",
+    "emotion": "happy",
+    "confidence": 0.89
+  },
+  {
+    "input": "what is my best friend name?",
+    "emotion": "neutral",
+    "confidence": 0.88
+  },
+  {
+    "input": "my best friend is Marcel",
+    "emotion": "neutral",
+    "confidence": 0.85
+  },
+  {
+    "input": "What is my best friend name?",
+    "emotion": "neutral",
+    "confidence": 0.85
+  },
+  {
+    "input": "we are doing a big project together",
+    "emotion": "excited",
+    "confidence": 0.85
+  },
+  {
+    "input": "im feeling down",
+    "emotion": "sad",
+    "confidence": 0.95
+  },
+  {
+    "input": "other kids was mean to me",
+    "emotion": "sad",
+    "confidence": 0.95
+  },
+  {
+    "input": "i want to run away",
+    "emotion": "scared",
+    "confidence": 0.89
+  }
+]
