@@ -4,9 +4,6 @@ import os
 import logging
 
 
-logging.basicConfig(level=logging.ERROR)
-
-
 class s:
     pass
 
