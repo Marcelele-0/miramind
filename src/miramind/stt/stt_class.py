@@ -47,10 +47,10 @@ class STT:
                                                                  file=audio_file,
                                                                  response_format="json",)
             
-        response = self.client.chat.completions.create(model=os.environ.get("LANGUAGE_DETECTION_DEPLOYMENT", "04-mini"),
-                                                       messages=get_language_detection_prompt(transcript.text),)
+        # response = self.client.chat.completions.create(model=os.environ.get("LANGUAGE_DETECTION_DEPLOYMENT", "04-mini"),
+        #                                                messages=get_language_detection_prompt(transcript.text),)
         
-        return {"language": response.choices[0].message.content,
+        return {#"language": response.choices[0].message.content,
                 "transcript": transcript.text}
         
 
