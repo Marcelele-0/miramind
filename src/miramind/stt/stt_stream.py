@@ -1,9 +1,12 @@
 import sounddevice as sd
-from scipy.io.wavfile import write
-from stt.stt_class import STT
-from queue import Queue
-from stt.loggers import SentinelLogger, get_loggers
+
 from dotenv import load_dotenv
+from scipy.io.wavfile import write
+
+from queue import Queue
+from stt.stt_class import STT
+from stt.loggers import SentinelLogger, get_loggers
+
 import threading
 import os
 import time
@@ -15,7 +18,7 @@ import base64
 SENTINEL_LOGGER = SentinelLogger()
 DURATION = 5
 SAMPLE_RATE = 44100
-rec_stream_logger, stt_stream_logger = get_loggers()
+REC_STREAM_LOGGER, STT_STREAM_LOGGER = get_loggers()
 logging.raiseExceptions = False
 
 
@@ -52,8 +55,7 @@ class RecordingStream:
         load_dotenv()
         self._file_queue = Queue()
         self.save_dir = save_dir if save_dir is not None else f"{os.environ['MIRAMIND_TEMP']}/sttr_temp"
-        if not os.path.isdir(self.save_dir):
-            raise ValueError(f"No such directory: {self.save_dir}")
+        os.makedirs(self.save_dir, exist_ok=True)
         self._stop_flag = threading.Event()
 
     def get_file_queue(self):
@@ -113,7 +115,7 @@ class RecordingStream:
             prompting_func: function to be called when recording is starting.
             loop_indicator_func: function to indicate change of chunks.
             
-            Rest keyword arguments are specific to prompting_function and loop_indicator_func.
+            Rest of keyword arguments are specific to prompting_function and loop_indicator_func.
 
         Returns:
             None
@@ -121,15 +123,15 @@ class RecordingStream:
 
         # first lagged run
         path = f"{self.save_dir}/{get_short_uuid()}.wav"
-        rec_stream_logger.info("First rec")
-        self.record(path=path, logger=rec_stream_logger, duration=0.1)
+        REC_STREAM_LOGGER.info("First rec")
+        self.record(path=path, logger=REC_STREAM_LOGGER, duration=0.1)
         kwargs.get("prompting_func", lambda **x: print("Start speaking"))(**kwargs)
         loop_index = 0
         t = time.time()
 
         while not self._stop_flag.is_set():
             path = f"{self.save_dir}/{get_short_uuid()}.wav"
-            self.record(path=path, logger=rec_stream_logger, **kwargs)
+            self.record(path=path, logger=REC_STREAM_LOGGER, **kwargs)
             self._file_queue.put(path)
             loop_index += 1
             kwargs.get("loop_indicator_func", lambda **x: print(f"Loop nr {loop_index}, time {time.time() - t}"))(**kwargs)
@@ -203,11 +205,11 @@ class STTStream:
                 file, transcript = self.transcribe()
                 if verbose:
                     try:
-                        stt_stream_logger.info(f"Transcript of {file} completed. Time elapsed: {time.time() - t}.\n Transcript: {transcript["transcript"]}")
+                        STT_STREAM_LOGGER.info(f"Transcript of {file} completed. Time elapsed: {time.time() - t}.\n Transcript: {transcript["transcript"]}")
                     except UnicodeEncodeError:
-                        stt_stream_logger.info(f"Transcript of {file} completed. Time elapsed: {time.time() - t}")
+                        STT_STREAM_LOGGER.info(f"Transcript of {file} completed. Time elapsed: {time.time() - t}")
                 else:
-                    stt_stream_logger.info(f"Transcript of {file} completed. Time elapsed: {time.time() - t}")
+                    STT_STREAM_LOGGER.info(f"Transcript of {file} completed. Time elapsed: {time.time() - t}")
 
         while not self.target_queue.empty():
             t = time.time()
@@ -215,11 +217,11 @@ class STTStream:
             file, transcript = self.transcribe()
             if verbose:
                 try:
-                    stt_stream_logger.info(f"Transcript of {file} completed. Time elapsed: {time.time() - t}.\n Transcript: {transcript["transcript"]}")
+                    STT_STREAM_LOGGER.info(f"Transcript of {file} completed. Time elapsed: {time.time() - t}.\n Transcript: {transcript["transcript"]}")
                 except UnicodeEncodeError:
-                    stt_stream_logger.info(f"Transcript of {file} completed. Time elapsed: {time.time() - t}")
+                    STT_STREAM_LOGGER.info(f"Transcript of {file} completed. Time elapsed: {time.time() - t}")
             else:
-                stt_stream_logger.info(f"Transcript of {file} completed. Time elapsed: {time.time() - t}")
+                STT_STREAM_LOGGER.info(f"Transcript of {file} completed. Time elapsed: {time.time() - t}")
 
 
 class RecSTTStream:
