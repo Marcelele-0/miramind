@@ -1,8 +1,8 @@
 import sounddevice as sd
 from scipy.io.wavfile import write
-from stt import STT
+from stt.stt_class import STT
 from queue import Queue
-from loggers import stt_stream_logger, rec_stream_logger, SentinelLogger
+from stt.loggers import SentinelLogger, get_loggers
 from dotenv import load_dotenv
 import threading
 import os
@@ -15,6 +15,8 @@ import base64
 SENTINEL_LOGGER = SentinelLogger()
 DURATION = 5
 SAMPLE_RATE = 44100
+rec_stream_logger, stt_stream_logger = get_loggers()
+logging.raiseExceptions = False
 
 
 def get_short_uuid():
@@ -200,16 +202,22 @@ class STTStream:
                 # stt_stream_logger.info("Transcribing...")
                 file, transcript = self.transcribe()
                 if verbose:
-                    stt_stream_logger.info(f"Transcript of {file} completed. Time elapsed: {time.time() - t}.\n Transcript: {transcript["transcript"]}")
+                    try:
+                        stt_stream_logger.info(f"Transcript of {file} completed. Time elapsed: {time.time() - t}.\n Transcript: {transcript["transcript"]}")
+                    except UnicodeEncodeError:
+                        stt_stream_logger.info(f"Transcript of {file} completed. Time elapsed: {time.time() - t}")
                 else:
                     stt_stream_logger.info(f"Transcript of {file} completed. Time elapsed: {time.time() - t}")
-        
+
         while not self.target_queue.empty():
             t = time.time()
             # stt_stream_logger.info("Transcribing...")
             file, transcript = self.transcribe()
             if verbose:
-                stt_stream_logger.info(f"Transcript of {file} completed. Time elapsed: {time.time() - t}.\n Transcript: {transcript["transcript"]}")
+                try:
+                    stt_stream_logger.info(f"Transcript of {file} completed. Time elapsed: {time.time() - t}.\n Transcript: {transcript["transcript"]}")
+                except UnicodeEncodeError:
+                    stt_stream_logger.info(f"Transcript of {file} completed. Time elapsed: {time.time() - t}")
             else:
                 stt_stream_logger.info(f"Transcript of {file} completed. Time elapsed: {time.time() - t}")
 
@@ -316,9 +324,9 @@ def test3():
     """
     Example of usage.
     """
-    stream = RecSTTStream(duration=4)
+    stream = RecSTTStream(duration=3)
     stream.start()
-    for i in range(10):
+    for i in range(25):
         time.sleep(1)
         print(i + 1)
 
