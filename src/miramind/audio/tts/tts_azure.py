@@ -30,20 +30,17 @@ class AzureTTSProvider(TTSProvider):
 
         # Define emotion styles mapping
         self.emotion_styles = {
-            'angry': 'angry',
             'assistant': 'assistant',
             'cheerful': 'cheerful',
             'chat': 'chat',
-            'customerservice': 'customerservice',
             'excited': 'excited',
             'friendly': 'friendly',
             'hopeful': 'hopeful',
             'newscast': 'newscast',
             'sad': 'sad',
-            'shouting': 'shouting',
-            'terrified': 'terrified',
-            'unfriendly': 'unfriendly',
             'whispering': 'whispering',
+            'scared': 'general',
+            'anxious': 'general',
             'neutral': 'general',  # general is the default style
             'happy': 'cheerful',  # mapping for common emotion name
         }

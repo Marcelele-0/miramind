@@ -17,17 +17,6 @@ repos:
           - --skip-string-normalization
           - --target-version=py310
 
-  # Import sorting
-  - repo: https://github.com/pycqa/isort
-    rev: 6.0.1
-    hooks:
-      - id: isort
-        args:
-          - --profile=black
-          - --line-length=100
-          - --multi-line=3
-          - --trailing-comma
-
   # Commit message validation
   - repo: https://github.com/compilerla/conventional-pre-commit
     rev: v4.2.0
