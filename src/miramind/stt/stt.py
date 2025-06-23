@@ -43,13 +43,12 @@ class STT:
 
         load_dotenv()
         with open(file_path, "rb") as audio_file:
-            transcript = self.client.audio.transcriptions.create(model=os.environ.get("STT_DEPLOYMENT", "gpt-4o-_transcribe"),
+            transcript = self.client.audio.transcriptions.create(model=os.environ.get("STT_DEPLOYMENT", "gpt-4o-transcribe"),
                                                                  file=audio_file,
                                                                  response_format="json",)
             
-        response = self.client.chat.completions.create(model=os.environ.get("LANG_DETECT_DEPLOYMENT", "gpt-4o"),
-                                                       messages=get_language_detection_prompt(transcript.text),
-                                                       temperature=0.0)
+        response = self.client.chat.completions.create(model=os.environ.get("LANGUAGE_DETECTION_DEPLOYMENT", "04-mini"),
+                                                       messages=get_language_detection_prompt(transcript.text),)
         
         return {"language": response.choices[0].message.content,
                 "transcript": transcript.text}
