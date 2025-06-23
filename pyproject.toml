@@ -29,9 +29,7 @@ dependencies = [
     "python-dotenv>=1.0.0",
     "openai",
     "pytubefix",
-    # Azure TTS dependencies
     "azure-cognitiveservices-speech>=1.34.0",
-    # pytest for tests
     "pytest"
     "sounddevice",
     "scipy",
