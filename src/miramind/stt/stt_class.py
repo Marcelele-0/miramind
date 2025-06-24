@@ -1,4 +1,4 @@
-from shared import MyClient, S, msg
+from shared.utils import get_azure_openai_client
 from dotenv import load_dotenv
 import os
 
@@ -20,12 +20,11 @@ class STT:
         client: client instance used for API calls.
     """
 
-    def __init__(self):
+    def __init__(self, client):
         """
         Constructor of STT class.
         """
-        
-        self.client = MyClient.get()
+        self.client = client
 
     def transcribe(self, file_path: str) -> dict[str: str]:
         """
@@ -46,7 +45,8 @@ class STT:
             transcript = self.client.audio.transcriptions.create(model=os.environ.get("STT_DEPLOYMENT", "gpt-4o-transcribe"),
                                                                  file=audio_file,
                                                                  response_format="json",)
-            
+        
+        # TODO: decide if this part is necessary
         # response = self.client.chat.completions.create(model=os.environ.get("LANGUAGE_DETECTION_DEPLOYMENT", "04-mini"),
         #                                                messages=get_language_detection_prompt(transcript.text),)
         
@@ -55,7 +55,9 @@ class STT:
         
 
 if __name__ == "__main__":
-    my_stt = STT()
+    load_dotenv()
+    client = get_azure_openai_client()
+    my_stt = STT(client=client)
     t = my_stt.transcribe(f"{os.environ['TESTS_DIR']}/stt/rick_roll.m4a")
     print(t)
     
