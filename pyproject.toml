@@ -48,4 +48,4 @@ dev = [
 
 # CLI entry point (if you want a command-line tool)
 [project.scripts]
-ytd = "downloader:main"
+ytd = "downloader.ytd:main"

@@ -211,6 +211,7 @@ class STTStream:
                         f"Transcript of {file} completed. Time elapsed: {time.time() - t}"
                     )
 
+        # second loop to handle all files enqueued before setting the flag.
         while not self.target_queue.empty():
             t = time.time()
             file, transcript = self.transcribe()
@@ -256,29 +257,31 @@ class RecSTTStream:
             duration: duration of a chunk.
             sample_rate: sample rate of a chunk.
             verbose: if True, log verbosity increased.
+            rec_stream: RecordingStream instance used for handling recording.
+            stt_stream: STTStream instance used for handling transcribing.
             stt_logger: logger instance used for logging STT process.
             rec_logger: logger instance used for logging recording.
         """
         self.stt_logger = stt_logger if stt_logger is not None else logging.getLogger()
         self.rec_logger = rec_logger if rec_logger is not None else logging.getLogger()
-        rec_stream = RecordingStream(logger=self.rec_logger)
-        stt_stream = STTStream(
-            target_queue=rec_stream.get_file_queue(), client=client, logger=self.rec_logger
+        self.rec_stream = RecordingStream(logger=self.rec_logger)
+        self.stt_stream = STTStream(
+            target_queue=self.rec_stream.get_file_queue(), client=client, logger=self.rec_logger
         )
-        self.buffer = stt_stream.get_buffer()
+        self.buffer = self.stt_stream.get_buffer()
 
         self.rec_thread = threading.Thread(
-            target=rec_stream.run,
+            target=self.rec_stream.run,
             kwargs={"duration": duration, "sample_rate": sample_rate},
             name="RECORDING THREAD",
         )
         stt_thread_kwargs = {"verbose": verbose}
         self.stt_thread = threading.Thread(
-            target=stt_stream.run, kwargs=stt_thread_kwargs, name="STT THREAD"
+            target=self.stt_stream.run, kwargs=stt_thread_kwargs, name="STT THREAD"
         )
 
-        self.rec_flag = rec_stream.get_stop_flag()
-        self.stt_flag = stt_stream.get_stop_flag()
+        self.rec_flag = self.rec_stream.get_stop_flag()
+        self.stt_flag = self.stt_stream.get_stop_flag()
 
     def start(self):
         """
@@ -301,4 +304,4 @@ class RecSTTStream:
         self.rec_thread.join()
         self.stt_flag.set()
         self.stt_thread.join()
-        return self.buffer
+        return self.stt_stream.get_buffer()
