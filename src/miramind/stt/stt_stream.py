@@ -1,25 +1,16 @@
 import sounddevice as sd
-
 from dotenv import load_dotenv
-from scipy.io.wavfile import write
-
 from queue import Queue
 from stt.stt_class import STT
-from stt.loggers import SentinelLogger, get_loggers
+from stt.consts import DURATION, SAMPLE_RATE
 
+import scipy
 import threading
 import os
 import time
 import logging
 import uuid
 import base64
-
-
-SENTINEL_LOGGER = SentinelLogger()
-DURATION = 5
-SAMPLE_RATE = 44100
-REC_STREAM_LOGGER, STT_STREAM_LOGGER = get_loggers()
-logging.raiseExceptions = False
 
 
 def get_short_uuid():
@@ -44,36 +35,34 @@ class RecordingStream:
         _stop_flag: threading.Event instance used to stop run method.
     """
 
-    def __init__(self, save_dir: str = None):
+    def __init__(self, save_dir: str = None, logger=None):
         """
         Constructor of RecordingStream class.
 
         Args:
             save_dir: path to directory where recordings are saved. Default depends on .env file.
+            logger: logging instance used for logging.
         """
-
-        load_dotenv()
         self._file_queue = Queue()
         self.save_dir = save_dir if save_dir is not None else f"{os.environ['MIRAMIND_TEMP']}/sttr_temp"
         os.makedirs(self.save_dir, exist_ok=True)
         self._stop_flag = threading.Event()
+        self.logger = logger if logger is not None else logging.getLogger()
 
     def get_file_queue(self):
         """
         Get _file_queue attribute.
         """
-
         return self._file_queue
     
     def get_stop_flag(self):
         """
         Get _stop_flag attribute.
         """
-
         return self._stop_flag
 
     @staticmethod
-    def record(path: str = "output.wav", logger: logging.Logger = SENTINEL_LOGGER, **kwargs):
+    def record(path: str = "output.wav", logger: logging.Logger = None, **kwargs):
         """
         Static method used for recording audio. After running this method program will record from default system microphone.
 
@@ -91,6 +80,7 @@ class RecordingStream:
 
         duration = kwargs.get("duration", DURATION)
         sample_rate = kwargs.get("sample_rate", SAMPLE_RATE)
+        logger = logging.getLogger() if logger is None else logger
 
         # logger.info("Recording...")
         t = time.time()
@@ -98,7 +88,7 @@ class RecordingStream:
         sd.wait()
         logger.info(f"Recording completed. Time elapsed {time.time() - t}")
         t = time.time()
-        write(path, sample_rate, audio)
+        scipy.io.wavfile.write(path, sample_rate, audio)
         logger.info(f"Saved to {path}")
         logger.info(f"Saving completed. Time elapsed: {time.time() - t}")
     
@@ -123,15 +113,15 @@ class RecordingStream:
 
         # first lagged run
         path = f"{self.save_dir}/{get_short_uuid()}.wav"
-        REC_STREAM_LOGGER.info("First rec")
-        self.record(path=path, logger=REC_STREAM_LOGGER, duration=0.1)
+        self.logger.info("First rec")
+        self.record(path=path, logger=self.logger, duration=0.1)
         kwargs.get("prompting_func", lambda **x: print("Start speaking"))(**kwargs)
         loop_index = 0
         t = time.time()
 
         while not self._stop_flag.is_set():
             path = f"{self.save_dir}/{get_short_uuid()}.wav"
-            self.record(path=path, logger=REC_STREAM_LOGGER, **kwargs)
+            self.record(path=path, logger=self.logger, **kwargs)
             self._file_queue.put(path)
             loop_index += 1
             kwargs.get("loop_indicator_func", lambda **x: print(f"Loop nr {loop_index}, time {time.time() - t}"))(**kwargs)
@@ -144,36 +134,37 @@ class STTStream:
 
     Attributes:
         target_queue: Queue instance containing paths of recordings to transcribe.
-        _stt: STT instance used to transcribe recordings.
-        _stop_flag: threading.Event instance used to stop run method.
-        _buffer: Queue instance where transcripts are put.
+        stt: STT instance used to transcribe recordings.
+        stop_flag: threading.Event instance used to stop run method.
+        buffer: Queue instance where transcripts are put.
     """
 
-    def __init__(self, target_queue):
+    def __init__(self, target_queue, client, logger=None):
         """
         Constructor of STTStream.
 
         Args:
             target_queue: Queue instance where paths of files to transcribe are stored.
+            client: client instance used for API calls.
+            logger: logger instance used for logging.
         """
         self.target_queue = target_queue
-        self._stt = STT()
-        self._buffer = Queue()
-        self._stop_flag = threading.Event()
+        self.stt = STT(client)
+        self.logger = logger if logger is not None else logging.getLogger()
+        self.buffer = Queue()
+        self.stop_flag = threading.Event()
 
     def get_stop_flag(self):
         """
-        Get _stop_flag attribute.
+        Get stop_flag attribute.
         """
-
-        return self._stop_flag
+        return self.stop_flag
     
     def get_buffer(self):
         """
-        Get _buffer attribute.
+        Get buffer attribute.
         """
-
-        return self._buffer
+        return self.buffer
 
     def transcribe(self):
         """
@@ -183,11 +174,11 @@ class STTStream:
             file, transcript: path of transcribed file and transcription
         """
         file = self.target_queue.get()
-        transcript = self._stt.transcribe(file)
-        self._buffer.put(transcript)
+        transcript = self.stt.transcribe(file)
+        self.buffer.put(transcript)
         return file, transcript
 
-    def run(self, verbose=True, **kwargs):
+    def run(self, verbose=True):
         """
         Method used as target function of a Thread. The using this method will result in transcribing files enqueued in target_queue,
         then transcripts are put into _buffer. It will be stopped when _stop_flag is set.
@@ -198,30 +189,28 @@ class STTStream:
         Returns:
             None
         """
-        while not self._stop_flag.is_set():
+        while not self.stop_flag.is_set():
             if not self.target_queue.empty():
                 t = time.time()
-                # stt_stream_logger.info("Transcribing...")
                 file, transcript = self.transcribe()
                 if verbose:
                     try:
-                        STT_STREAM_LOGGER.info(f"Transcript of {file} completed. Time elapsed: {time.time() - t}.\n Transcript: {transcript["transcript"]}")
+                        self.logger.info(f"Transcript of {file} completed. Time elapsed: {time.time() - t}.\n Transcript: {transcript["transcript"]}")
                     except UnicodeEncodeError:
-                        STT_STREAM_LOGGER.info(f"Transcript of {file} completed. Time elapsed: {time.time() - t}")
+                        self.logger.info(f"Transcript of {file} completed. Time elapsed: {time.time() - t}")
                 else:
-                    STT_STREAM_LOGGER.info(f"Transcript of {file} completed. Time elapsed: {time.time() - t}")
+                    self.logger.info(f"Transcript of {file} completed. Time elapsed: {time.time() - t}")
 
         while not self.target_queue.empty():
             t = time.time()
-            # stt_stream_logger.info("Transcribing...")
             file, transcript = self.transcribe()
             if verbose:
                 try:
-                    STT_STREAM_LOGGER.info(f"Transcript of {file} completed. Time elapsed: {time.time() - t}.\n Transcript: {transcript["transcript"]}")
+                    self.logger.info(f"Transcript of {file} completed. Time elapsed: {time.time() - t}.\n Transcript: {transcript["transcript"]}")
                 except UnicodeEncodeError:
-                    STT_STREAM_LOGGER.info(f"Transcript of {file} completed. Time elapsed: {time.time() - t}")
+                    self.logger.info(f"Transcript of {file} completed. Time elapsed: {time.time() - t}")
             else:
-                STT_STREAM_LOGGER.info(f"Transcript of {file} completed. Time elapsed: {time.time() - t}")
+                self.logger.info(f"Transcript of {file} completed. Time elapsed: {time.time() - t}")
 
 
 class RecSTTStream:
@@ -236,21 +225,23 @@ class RecSTTStream:
         stt_flag: event used to stop stt_thread.
     """
 
-    def __init__(self, **kwargs):
+    def __init__(self, client, duration=DURATION, sample_rate=SAMPLE_RATE, verbose=True):
         """
         Constructor of RecSTTStream.
 
-        Keyword Args:
+        Args:
+            client: client instance used for API calls.
             duration: duration of a chunk.
             sample_rate: sample rate of a chunk.
             verbose: if True, log verbosity increased.
         """
         rec_stream = RecordingStream()
-        stt_stream = STTStream(target_queue=rec_stream.get_file_queue())
+        stt_stream = STTStream(target_queue=rec_stream.get_file_queue(), client=client)
         self.buffer = stt_stream.get_buffer()
 
         self.rec_thread = threading.Thread(target=rec_stream.run, kwargs=kwargs, name="RECORDING THREAD")
-        self.stt_thread = threading.Thread(target=stt_stream.run, kwargs=kwargs, name="STT THREAD")
+        stt_thread_kwargs = {"verbose": kwargs.get("verbose", True)}
+        self.stt_thread = threading.Thread(target=stt_stream.run, kwargs=stt_thread_kwargs, name="STT THREAD")
 
         self.rec_flag = rec_stream.get_stop_flag()
         self.stt_flag = stt_stream.get_stop_flag()
