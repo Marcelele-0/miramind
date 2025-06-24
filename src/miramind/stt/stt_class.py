@@ -28,6 +28,9 @@ class STT:
     def __init__(self, client):
         """
         Constructor of STT class.
+
+        Args:
+            client: client instance for API calls.
         """
         self.client = client
 
