@@ -38,7 +38,7 @@ dependencies = [
 
 [tool.setuptools.packages.find]
 where = ["src/miramind",
-    "src/scripts"]
+         "src/scripts"]
 
 [project.optional-dependencies]
 dev = [
