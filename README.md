@@ -6,15 +6,13 @@
 
 #### src/miramind/stt
 
-- STT._transcribe(file) -> dict: returns dictionary with "transcript" and "language" keywords. 
+- STT.transcribe(file) -> dict: returns dictionary with "transcript" keywords.
 
 #### src/miramind/shared
- 
- - MyClient.get() -> AzureOpenAi: returns AzureOpenAI client.
 
- ``` python
-client = MyClient.get()
- ```
+##### scr/miramind/shared/utils
+
+ - get_azure_openai_client(): return AzureOpenAi client instance for API calls.
 
  - msg(role, message) -> dict: returns dictionary with "role" and "content" keywords. role argument should be one of S, U, A constants.
 ``` python
@@ -25,18 +23,16 @@ print(messages)
 # [{'role': 'system', 'content': 'system prompt'}, {'role': 'assistant', 'content': 'assistnar response'}, {'role': 'user', 'content': 'user input'}]
 ```
 
+#### src/miramind/stt
+
+##### src/miramind/stt/stt_class
+ - STT: class for handling transcribing files.
+
 ### src/scripts
 
 #### scr/scripts/downloader
 
-CLI tool used to download YouTube videos as audio.
+CLI tool used to download YouTube videos as audio. Save directory depends on .env.
 ``` bash
 ytd -url "example url" -name "output file name"
 ```
-Using such command will result in creating file in tests/stt directory. If you need to use downloder not via command line, you can use
-``` python
-from downloader import download_yt_audio
-
-download_yt_audio(url="my url", name="output file name")
-```
-
