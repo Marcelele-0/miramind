@@ -1,5 +1,4 @@
 from openai import AzureOpenAI
-from dotenv import load_dotenv
 import os
 
 
@@ -13,7 +12,8 @@ def msg(role, message):
 
 
 def get_azure_openai_client():
-    return AzureOpenAI(azure_endpoint=os.environ["AZURE_OPENAI_ENDPOINT_URL"],
-                       api_key=os.environ["AZURE_OPENAI_API_KEY"],
-                       api_version=os.environ["AZURE_OPENAI_API_VERSION"])
-    
+    return AzureOpenAI(
+        azure_endpoint=os.environ["AZURE_OPENAI_ENDPOINT_URL"],
+        api_key=os.environ["AZURE_OPENAI_API_KEY"],
+        api_version=os.environ["AZURE_OPENAI_API_VERSION"],
+    )
