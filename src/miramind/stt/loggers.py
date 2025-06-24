@@ -1,14 +1,5 @@
 import logging
 import os
-from dotenv import load_dotenv
-
-
-class SentinelLogger:
-    def debug(self, *args):
-        pass
-
-    def info(self, *args):
-        pass
 
 
 def get_loggers():
