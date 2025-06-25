@@ -12,3 +12,5 @@ dependencies:
       - azure-cognitiveservices-speech
       - pytest
       - isort
+      - openai
+      - pytubefix
