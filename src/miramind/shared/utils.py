@@ -6,7 +6,7 @@ S, U, A = object(), object(), object()
 
 
 def msg(role, message):
-    role_dict = {S: "system", U: "user", A: "assistnat"}
+    role_dict = {S: "system", U: "user", A: "assistant"}
     return_val = {"role": role_dict[role], "content": message}
     return return_val
 
