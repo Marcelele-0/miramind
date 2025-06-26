@@ -607,5 +607,17 @@
     "emotion": "neutral",
     "confidence": 0.8,
     "response": "Hi Adam! It's great to meet you. How are you feeling today?"
+  },
+  {
+    "input": "it is raining outside",
+    "emotion": "neutral",
+    "confidence": 0.5,
+    "response": "Rainy days can feel different for everyone. Some people find the sound of rain calming, while others might feel a bit gloomy. How does the rain make you feel today?"
+  },
+  {
+    "input": "i dont know how to dress ",
+    "emotion": "anxious",
+    "confidence": 0.75,
+    "response": "That's okay! Picking out clothes can be a bit tricky at times. On a rainy day, layers might be a good idea so you can adjust to the temperature throughout the day. Maybe start with something comfortable and add a raincoat if you have one. Bright colors can also help lift your mood if the gray weather is bringing you down. What do you think would make you feel comfortable and happy today?"
   }
 ]
