@@ -1,16 +1,18 @@
 # --- Imports ---
 import os
 import json
-import re
 from typing import List, Dict, Any
 from dotenv import load_dotenv
-from pydantic import BaseModel, ValidationError
+from pydantic import ValidationError
 from langgraph.graph import StateGraph, END
 from langchain_core.runnables import RunnableLambda
 from openai import OpenAI
+from langchain_core.output_parsers import JsonOutputParser
+from langchain_core.pydantic_v1 import BaseModel
+from langchain_core.messages import HumanMessage, AIMessage, trim_messages
 
 from miramind.audio.tts.tts_factory import get_tts_provider
-from miramind.llm.langgraph.subgraphs import(
+from miramind.llm.langgraph.subgraphs import (
     build_sad_flow,
     build_angry_flow,
     build_excited_flow,
@@ -21,11 +23,6 @@ from miramind.llm.langgraph.utils import (
     call_openai,
     logger,
 )
-
-
-# --- Load Environment ---
-os.environ.pop("SSL_CERT_FILE", None)
-load_dotenv()
 
 # --- Config ---
 DEFAULT_MODEL = "gpt-4o"
@@ -41,14 +38,22 @@ EMOTION_PROMPT = (
     "Do not include any emojis."
 )
 
-# --- Clients ---
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-tts_provider = get_tts_provider("azure")
+# --- Initialization Function ---
+def initialize_clients():
+    load_dotenv()
+    openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+    tts = get_tts_provider("azure")
+    return openai_client, tts
+
+# --- Initialize Clients ---
+client, tts_provider = initialize_clients()
 
 # --- Models ---
-class EmotionResult(BaseModel):
+class EmotionSchema(BaseModel):
     emotion: str
     confidence: float
+
+parser = JsonOutputParser(pydantic_schema=EmotionSchema)
 
 # --- Core Nodes ---
 def detect_emotion(state: Dict[str, Any]) -> Dict[str, Any]:
@@ -63,14 +68,12 @@ def detect_emotion(state: Dict[str, Any]) -> Dict[str, Any]:
     emotion, confidence = "neutral", 0.0
 
     try:
-        match = re.search(r'{.*}', raw, re.DOTALL)
-        if match:
-            parsed = EmotionResult.parse_raw(match.group(0))
-            if parsed.emotion in VALID_EMOTIONS:
-                emotion = parsed.emotion
-                confidence = parsed.confidence
-    except ValidationError as e:
-        print(f"Emotion parsing error: {e}")
+        parsed = parser.parse(raw)
+        if parsed.emotion in VALID_EMOTIONS:
+            emotion = parsed.emotion
+            confidence = parsed.confidence
+    except Exception as e:
+        logger.log_error("Emotion parsing failed", error=str(e), raw_response=raw)
 
     return {
         **state,
@@ -85,15 +88,29 @@ def generate_response(style: str):
         chat_history = state.get("chat_history", [])
 
         system_content = (
-    f"You are a {style} non-licensed therapist who supports neurodivergent children in expressing and understanding their feelings. "
-    "Engage with empathy, encouragement, and patience. "
-    "Use age-appropriate, simple language. "
-    "Focus on helping the child explore their emotions and offer gentle guidance. "
-    "Avoid starting every sentence with apologies or statements like 'I understand.' "
-    "Instead, ask open-ended questions and validate the child's experiences in a supportive way."
-)
+            f"You are a {style} non-licensed therapist who supports neurodivergent children in expressing and understanding their feelings. "
+            "Engage with empathy, encouragement, and patience. "
+            "Use age-appropriate, simple language. "
+            "Focus on helping the child explore their emotions and offer gentle guidance. "
+            "Avoid starting every sentence with apologies or statements like 'I understand.' "
+            "Instead, ask open-ended questions and validate the child's experiences in a supportive way."
+        )
 
-        messages = [{"role": "system", "content": system_content}] + chat_history + [{"role": "user", "content": user_input}]
+        # --- Trim messages ---
+        formatted_chat = []
+        for msg in chat_history:
+            if msg["role"] == "user":
+                formatted_chat.append(HumanMessage(content=msg["content"]))
+            elif msg["role"] == "assistant":
+                formatted_chat.append(AIMessage(content=msg["content"]))
+
+        trimmed_chat = trim_messages(formatted_chat)
+
+        messages = [{"role": "system", "content": system_content}]
+        for msg in trimmed_chat:
+            messages.append({"role": msg.type, "content": msg.content})
+        messages.append({"role": "user", "content": user_input})
+
         reply = call_openai(messages)
 
         try:
@@ -123,7 +140,6 @@ def generate_response(style: str):
         }
     return responder
 
-
 # --- Main LangGraph ---
 main_graph = StateGraph(dict)
 
@@ -136,7 +152,6 @@ main_graph.add_node("angry_flow", build_angry_flow().compile())
 main_graph.add_node("excited_flow", build_excited_flow().compile())
 main_graph.add_node("gentle_flow", build_gentle_flow().compile())
 main_graph.add_node("neutral_flow", build_neutral_flow().compile())
-
 
 # Set entry and conditional routing
 main_graph.set_entry_point("detect_emotion")

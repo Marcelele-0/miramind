@@ -577,5 +577,35 @@
     "emotion": "neutral",
     "confidence": 0.0,
     "response": "You said your name is Adam. Is that right?"
+  },
+  {
+    "input": "hi im adam",
+    "emotion": "neutral",
+    "confidence": 0.5,
+    "response": "Hi Adam! It's great to meet you. How are you feeling today?"
+  },
+  {
+    "input": "hi my name is marcel",
+    "emotion": "neutral",
+    "confidence": 0.9,
+    "response": "Hi Marcel! It's nice to meet you. How are you feeling today?"
+  },
+  {
+    "input": "im fine, what is my name?",
+    "emotion": "neutral",
+    "confidence": 0.4,
+    "response": "Your name is Marcel. Is there anything specific you'd like to talk about today?"
+  },
+  {
+    "input": "hi im adam",
+    "emotion": "neutral",
+    "confidence": 0.5,
+    "response": "Hi Adam! It's nice to meet you. How are you feeling today?"
+  },
+  {
+    "input": "Hi im Adam",
+    "emotion": "neutral",
+    "confidence": 0.8,
+    "response": "Hi Adam! It's great to meet you. How are you feeling today?"
   }
 ]

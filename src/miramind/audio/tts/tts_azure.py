@@ -32,6 +32,9 @@ class AzureTTSProvider(TTSProvider):
         self.emotion_styles = {
             'assistant': 'assistant',
             'cheerful': 'cheerful',
+            'calm': 'calm',
+            'conversational': 'conversational',
+            'angry': 'calm',
             'chat': 'chat',
             'excited': 'excited',
             'friendly': 'friendly',
@@ -148,3 +151,4 @@ class AzureTTSProvider(TTSProvider):
         '''
 
         return ssml.strip()
+    
