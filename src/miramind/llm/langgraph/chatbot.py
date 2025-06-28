@@ -17,10 +17,11 @@ from miramind.llm.langgraph.subgraphs import (
     build_gentle_flow,
     build_neutral_flow
 )
-from miramind.llm.langgraph.utils import (
-    call_openai,
-    logger,
-)
+from miramind.llm.langgraph.utils import call_openai
+from miramind.shared.logger import logger  
+
+logger.info("Logger is working inside chatbot.py")
+
 
 # --- Config ---
 DEFAULT_MODEL = "gpt-4o"
@@ -53,6 +54,7 @@ class EmotionResult(BaseModel):
 
 # --- Core Nodes ---
 def detect_emotion(state: Dict[str, Any]) -> Dict[str, Any]:
+    logger.info("detect_emotion was called")
     user_input = state["user_input"]
 
     messages = [
@@ -71,7 +73,7 @@ def detect_emotion(state: Dict[str, Any]) -> Dict[str, Any]:
                 emotion = parsed.emotion
                 confidence = parsed.confidence
     except ValidationError as e:
-        print(f"Emotion parsing error: {e}")
+        logger.error(f"Emotion parsing error: {e}")  # ✅ Replaced print with logger
 
     return {
         **state,
@@ -103,14 +105,13 @@ def generate_response(style: str):
                 "emotion": state.get("emotion", "neutral")
             }))
         except Exception as e:
-            print(f"TTS synthesis error: {e}")
+            logger.error(f"TTS synthesis error: {e}") 
             audio_bytes = None
 
-        logger.log(
-            input_text=user_input,
-            emotion=state.get("emotion", "neutral"),
-            confidence=state.get("emotion_confidence", 0.0),
-            response_text=reply
+        logger.info(
+            f"Input: {user_input} | "
+            f"Emotion: {state.get('emotion', 'neutral')} ({state.get('emotion_confidence', 0.0):.2f}) | "
+            f"Response: {reply}"
         )
 
         return {

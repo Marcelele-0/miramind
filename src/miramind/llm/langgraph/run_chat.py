@@ -2,6 +2,9 @@ from miramind.llm.langgraph.chatbot import chatbot
 import sys
 import json
 import os
+from miramind.shared.logger import logger
+logger.info("Logger works inside run_chat.py")
+
 
 # Define the path where the output.wav should be saved inside frontend/public
 OUTPUT_AUDIO_PATH = os.path.join(os.path.dirname(__file__), "..", "..", "frontend", "public", "output.wav")
@@ -96,6 +99,7 @@ def main():
             memory = result.get("memory", memory)
 
             if result["audio_file_path"]:
+                logger.info(f"Audio file saved")
                 print(f" Audio saved to {result['audio_file_path']}")
 
 if __name__ == "__main__":
