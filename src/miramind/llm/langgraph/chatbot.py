@@ -10,7 +10,7 @@ from langchain_core.runnables import RunnableLambda
 from openai import OpenAI
 
 from miramind.audio.tts.tts_factory import get_tts_provider
-from miramind.llm.langgraph.subgraphs import(
+from miramind.llm.langgraph.subgraphs import (
     build_sad_flow,
     build_angry_flow,
     build_excited_flow,
@@ -21,11 +21,6 @@ from miramind.llm.langgraph.utils import (
     call_openai,
     logger,
 )
-
-
-# --- Load Environment ---
-os.environ.pop("SSL_CERT_FILE", None)
-load_dotenv()
 
 # --- Config ---
 DEFAULT_MODEL = "gpt-4o"
@@ -41,9 +36,15 @@ EMOTION_PROMPT = (
     "Do not include any emojis."
 )
 
-# --- Clients ---
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-tts_provider = get_tts_provider("azure")
+# --- Initialization Function ---
+def initialize_clients():
+    load_dotenv()
+    openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+    tts = get_tts_provider("azure")
+    return openai_client, tts
+
+# --- Initialize Clients ---
+client, tts_provider = initialize_clients()
 
 # --- Models ---
 class EmotionResult(BaseModel):
@@ -85,13 +86,13 @@ def generate_response(style: str):
         chat_history = state.get("chat_history", [])
 
         system_content = (
-    f"You are a {style} non-licensed therapist who supports neurodivergent children in expressing and understanding their feelings. "
-    "Engage with empathy, encouragement, and patience. "
-    "Use age-appropriate, simple language. "
-    "Focus on helping the child explore their emotions and offer gentle guidance. "
-    "Avoid starting every sentence with apologies or statements like 'I understand.' "
-    "Instead, ask open-ended questions and validate the child's experiences in a supportive way."
-)
+            f"You are a {style} non-licensed therapist who supports neurodivergent children in expressing and understanding their feelings. "
+            "Engage with empathy, encouragement, and patience. "
+            "Use age-appropriate, simple language. "
+            "Focus on helping the child explore their emotions and offer gentle guidance. "
+            "Avoid starting every sentence with apologies or statements like 'I understand.' "
+            "Instead, ask open-ended questions and validate the child's experiences in a supportive way."
+        )
 
         messages = [{"role": "system", "content": system_content}] + chat_history + [{"role": "user", "content": user_input}]
         reply = call_openai(messages)
@@ -123,7 +124,6 @@ def generate_response(style: str):
         }
     return responder
 
-
 # --- Main LangGraph ---
 main_graph = StateGraph(dict)
 
@@ -136,7 +136,6 @@ main_graph.add_node("angry_flow", build_angry_flow().compile())
 main_graph.add_node("excited_flow", build_excited_flow().compile())
 main_graph.add_node("gentle_flow", build_gentle_flow().compile())
 main_graph.add_node("neutral_flow", build_neutral_flow().compile())
-
 
 # Set entry and conditional routing
 main_graph.set_entry_point("detect_emotion")

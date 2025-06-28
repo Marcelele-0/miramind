@@ -577,5 +577,23 @@
     "emotion": "neutral",
     "confidence": 0.0,
     "response": "You said your name is Adam. Is that right?"
+  },
+  {
+    "input": "Hi im Adam",
+    "emotion": "neutral",
+    "confidence": 0.8,
+    "response": "Hi Adam! It's great to meet you. How are you doing today?"
+  },
+  {
+    "input": "I dont know if it is working",
+    "emotion": "neutral",
+    "confidence": 0.3,
+    "response": "Okay, it sounds like you're feeling uncertain about something. Can you tell me a bit more about what's going on or what might not be working?"
+  },
+  {
+    "input": "this aplication that im working on ",
+    "emotion": "neutral",
+    "confidence": 0.0,
+    "response": "Got it. Working on an application can be challenging. Are you facing any specific issues with it, or is there something about the process that's been difficult for you?"
   }
 ]

@@ -3,7 +3,6 @@ import sys
 import json
 import os
 
-
 # Define the path where the output.wav should be saved inside frontend/public
 OUTPUT_AUDIO_PATH = os.path.join(os.path.dirname(__file__), "..", "..", "frontend", "public", "output.wav")
 OUTPUT_AUDIO_PATH = os.path.abspath(OUTPUT_AUDIO_PATH)
@@ -58,8 +57,7 @@ def process_chat_message(user_input_text: str, chat_history: list = [], memory: 
             "memory": memory
         }
 
-
-if __name__ == "__main__":
+def main():
     # This block allows run_chat.py to be called from the command line with JSON input
     if len(sys.argv) > 1:
         try:
@@ -99,3 +97,6 @@ if __name__ == "__main__":
 
             if result["audio_file_path"]:
                 print(f" Audio saved to {result['audio_file_path']}")
+
+if __name__ == "__main__":
+    main()
