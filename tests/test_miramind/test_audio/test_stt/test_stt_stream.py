@@ -1,6 +1,7 @@
+import time
 from queue import Queue
 
-from miramind.audio.stt.stt_stream import RecordingStream, STTStream
+from miramind.audio.stt.stt_stream import RecordingStream, RecSTTStream, STTStream
 
 
 def test_recording(mocker):
@@ -26,9 +27,30 @@ def test_stt(mocker):
     mocker.patch("miramind.audio.stt.stt_stream.STT", return_value=mock_stt)
 
     q = Queue()
-    q.put("mockfile.wav")
-    stt_stream = STTStream(target_queue=q, client="mock_client")
+    q.put("fake file.wav")
+    stt_stream = STTStream(target_queue=q, client="fake client")
     stt_stream.transcribe()
 
     buffer = stt_stream.get_buffer()
     assert buffer.get() == {"transcript": "Hello!"}
+
+
+def test_recsttstream(mocker):
+    # mocking
+    mock_stt = mocker.Mock()
+    mock_stt.transcribe = mocker.Mock(return_value={"transcript": "Hello!"})
+    mocker.patch("miramind.audio.stt.stt_stream.STT", return_value=mock_stt)
+    mocker.patch("miramind.audio.stt.stt_stream.sd.rec", return_value=[[0]])
+    mocker.patch("miramind.audio.stt.stt_stream.sd.wait")
+    mocker.patch("miramind.audio.stt.stt_stream.scipy.io.wavfile.write")
+
+    recstt_stream = RecSTTStream(client="fake client")
+    recstt_stream.start()
+    time.sleep(1)
+    recstt_stream.stop()
+    buffer = recstt_stream.buffer
+
+    assert buffer.qsize() > 0
+    while buffer.qsize() > 0:
+        transcript = buffer.get()
+        assert transcript["transcript"] == "Hello!"
