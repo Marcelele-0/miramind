@@ -1,0 +1,44 @@
+[
+  {
+    "input": "hi im adam",
+    "emotion": "neutral",
+    "confidence": 0.85,
+    "response": "Hi Adam! It's great to meet you. How are you feeling today?"
+  },
+  {
+    "input": "Hi my name is Adam",
+    "emotion": "neutral",
+    "confidence": 0.5,
+    "response": "Hi Adam! It's great to meet you. How are you feeling today?"
+  },
+  {
+    "input": "Hi im Adam",
+    "emotion": "neutral",
+    "confidence": 0.0,
+    "response": "Hi Adam! It's nice to meet you. How are you feeling today?"
+  },
+  {
+    "input": "I want to run ",
+    "emotion": "excited",
+    "confidence": 0.7,
+    "response": "Hi Adam! Running sounds like so much fun! It's a great way to use up some of the extra energy we sometimes have, and it can make you feel really good, too. Are you feeling excited about running, or is there something that's on your mind while you're thinking about it?"
+  },
+  {
+    "input": "I want to hide under my bed",
+    "emotion": "scared",
+    "confidence": 0.85,
+    "response": "It's okay to feel like you need a safe place sometimes. Under your bed might feel like a cozy little hideaway where the world can\u2019t reach you. Can you tell me what's making you feel like hiding today?"
+  },
+  {
+    "input": "i want to dance",
+    "emotion": "excited",
+    "confidence": 0.85,
+    "response": "That's fantastic! Dancing can be such a wonderful way to express your feelings and have fun. What kind of music gets you in the mood to dance? Or is there a specific type of dance you enjoy?"
+  },
+  {
+    "input": "I want to sleep",
+    "emotion": "neutral",
+    "confidence": 0.8,
+    "response": "It sounds like you're feeling really tired right now. Have you been having trouble sleeping, or is there something that might be keeping you awake? Sometimes talking about what's on your mind can help."
+  }
+]
