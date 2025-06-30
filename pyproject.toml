@@ -41,8 +41,7 @@ dependencies = [
 
 [tool.setuptools.packages.find]
 where = [
-    "src/miramind",
-    "src/scripts"
+    "src"
 ]
 
 [project.optional-dependencies]
@@ -66,4 +65,4 @@ known_first_party = ["miramind"]
 
 # CLI entry point (if you want a command-line tool)
 [project.scripts]
-ytd = "downloader.ytd:main"
+ytd = "scripts.downloader.ytd:main"
