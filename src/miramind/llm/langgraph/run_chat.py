@@ -39,14 +39,14 @@ def process_chat_message(user_input_text: str, chat_history: list = [], memory: 
             os.makedirs(os.path.dirname(OUTPUT_AUDIO_PATH), exist_ok=True)
             with open(OUTPUT_AUDIO_PATH, "wb") as f:
                 f.write(audio_data)
-            print(f" Response audio saved to {OUTPUT_AUDIO_PATH}")
+            # print(f" Response audio saved to {OUTPUT_AUDIO_PATH}")
             return {
                 "response_text": response_text,
                 "audio_file_path": OUTPUT_AUDIO_PATH,
                 "memory": updated_memory
             }
         else:
-            print(" No audio generated.")
+            # print(" No audio generated.")
             return {
                 "response_text": response_text,
                 "audio_file_path": None,

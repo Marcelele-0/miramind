@@ -6,7 +6,7 @@ import re
 from typing import List, Dict, Any
 from openai import OpenAI
 from dotenv import load_dotenv
-
+from miramind.shared.logger import logger  
 from miramind.audio.tts.tts_factory import get_tts_provider
 
 # --- Load Environment ---
@@ -46,7 +46,7 @@ class EmotionLogger:
         except Exception as e:
             print(f"Logging failed: {e}")
 
-logger = EmotionLogger(LOG_FILE)
+EmotionLogger = EmotionLogger(LOG_FILE)
 
 # --- API Helper ---
 def call_openai(messages: List[Dict[str, str]], model: str = DEFAULT_MODEL) -> str:
@@ -62,6 +62,7 @@ def generate_response(style: str):
     def responder(state: Dict[str, Any]) -> Dict[str, Any]:
         user_input = state["user_input"]
         chat_history = state.get("chat_history", [])
+        logger.info(f"running response generator with style: {style}")    
 
         system_content = (
             f"You are a {style} non-licensed therapist who helps neurodivergent children talk about their feelings. "
@@ -80,7 +81,13 @@ def generate_response(style: str):
             print(f"TTS synthesis error: {e}")
             audio_bytes = None
 
-        logger.log(
+        EmotionLogger.log(
+            input_text=user_input,
+            emotion=state.get("emotion", "neutral"),
+            confidence=state.get("emotion_confidence", 0.0),
+            response_text=reply
+        )
+        logger.info(
             input_text=user_input,
             emotion=state.get("emotion", "neutral"),
             confidence=state.get("emotion_confidence", 0.0),
