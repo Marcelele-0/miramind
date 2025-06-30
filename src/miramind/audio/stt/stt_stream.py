@@ -1,15 +1,15 @@
-import sounddevice as sd
+import base64
+import logging
+import os
+import threading
+import time
+import uuid
 from queue import Queue
-from stt.stt_class import STT
-from stt.consts import DURATION, SAMPLE_RATE
 
 import scipy
-import threading
-import os
-import time
-import logging
-import uuid
-import base64
+import sounddevice as sd
+from stt.consts import DURATION, SAMPLE_RATE
+from stt.stt_class import STT
 
 
 def get_short_uuid():

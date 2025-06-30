@@ -1,6 +1,6 @@
-from openai import AzureOpenAI
 import os
 
+from openai import AzureOpenAI
 
 S, U, A = object(), object(), object()
 

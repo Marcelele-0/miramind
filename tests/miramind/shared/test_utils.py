@@ -1,4 +1,4 @@
-from shared.utils import get_azure_openai_client, msg, A, U, S
+from shared.utils import A, S, U, get_azure_openai_client, msg
 
 
 def test_msg():

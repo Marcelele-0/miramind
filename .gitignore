@@ -38,6 +38,7 @@ pip-wheel-metadata/
 *.mp3
 *.ogg
 *.m4a
+*.m4a
 audio_cache/
 tts_output/
 whisper_output/
@@ -45,9 +46,18 @@ transcripts/
 
 # === Credentials / secrets ===
 .env
+<<<<<<< HEAD
+.env.local
+.env.production
+.env.staging
+=======
+>>>>>>> 8bc6f8c (added .env.example)
 secrets.json
 *.key
 *.pem
+
+# Allow .env.example
+!.env.example
 
 # === LangGraph states / temp ===
 *.jsonl
@@ -107,4 +117,4 @@ emotion_trends/
 user_insights/
 
 # === Temp dirs ===
-temp/sttr_temp/
+temp/sttr_temp
