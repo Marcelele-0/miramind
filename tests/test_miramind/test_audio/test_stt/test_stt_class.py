@@ -1,12 +1,12 @@
-import os
-import pathlib
-
-from dotenv import load_dotenv
-from pytubefix import YouTube
-from shared.utils import get_azure_openai_client
-from stt.stt_class import STT
-from stt.stt_stream import get_short_uuid
+from miramind.audio.stt.stt_class import STT
 
 
-def test_STT():
-    assert True
+def test_STT(mocker):
+    # Mocking
+    mock_transcript = mocker.Mock()
+    mock_transcript.text = "fake transcript"
+    mock_azure_openai_client = mocker.Mock()
+    mock_azure_openai_client.audio.transcriptions.create = mocker.Mock(return_value=mock_transcript)
+    mocker.patch("builtins.open")
+    stt = STT(client=mock_azure_openai_client)
+    assert stt.transcribe("fake file") == {"transcript": "fake transcript"}
