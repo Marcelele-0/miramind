@@ -2,6 +2,7 @@ import json
 
 import azure.cognitiveservices.speech as speechsdk
 
+from ...shared.logger import logger
 from .tts_base import TTSProvider
 
 
@@ -30,20 +31,20 @@ class AzureTTSProvider(TTSProvider):
 
         # Define emotion styles mapping
         self.emotion_styles = {
-            'angry': 'angry',
             'assistant': 'assistant',
             'cheerful': 'cheerful',
+            'calm': 'calm',
+            'conversational': 'conversational',
+            'angry': 'calm',
             'chat': 'chat',
-            'customerservice': 'customerservice',
             'excited': 'excited',
             'friendly': 'friendly',
             'hopeful': 'hopeful',
             'newscast': 'newscast',
             'sad': 'sad',
-            'shouting': 'shouting',
-            'terrified': 'terrified',
-            'unfriendly': 'unfriendly',
             'whispering': 'whispering',
+            'scared': 'general',
+            'anxious': 'general',
             'neutral': 'general',  # general is the default style
             'happy': 'cheerful',  # mapping for common emotion name
         }
@@ -64,13 +65,17 @@ class AzureTTSProvider(TTSProvider):
         try:
             data = json.loads(input_json)
         except json.JSONDecodeError:
+            logger.error("Invalid JSON format in input_json")
             raise ValueError("Invalid JSON format in input_json")
 
         if 'text' not in data:
+            logger.error("Missing 'text' field in input_json")
             raise ValueError("Missing 'text' field in input_json")
 
         text = data['text']
         emotion = data.get('emotion', 'neutral')
+
+        logger.debug(f"Synthesizing speech for text: '{text[:30]}...' with emotion: '{emotion}'")
 
         # Create speech config - updated approach (2025)
         if self.endpoint and self.subscription_key:
@@ -91,6 +96,7 @@ class AzureTTSProvider(TTSProvider):
 
         # Check result status
         if result.reason == speechsdk.ResultReason.SynthesizingAudioCompleted:
+            logger.debug("Speech synthesis completed successfully.")
             return result.audio_data
         elif result.reason == speechsdk.ResultReason.Canceled:
             cancellation_details = result.cancellation_details
@@ -99,8 +105,10 @@ class AzureTTSProvider(TTSProvider):
                 error_msg += f" | ErrorCode: {cancellation_details.error_code}"
                 error_msg += f" | ErrorDetails: {cancellation_details.error_details}"
                 error_msg += "  | Check if speech resource key and endpoint are correct"
+            logger.error(error_msg)
             raise RuntimeError(error_msg)
         else:
+            logger.error(f"Speech synthesis failed: {result.reason}")
             raise RuntimeError(f"Speech synthesis failed: {result.reason}")
 
     def set_emotion(self, text: str, emotion: str) -> str:
@@ -151,3 +159,4 @@ class AzureTTSProvider(TTSProvider):
         '''
 
         return ssml.strip()
+    

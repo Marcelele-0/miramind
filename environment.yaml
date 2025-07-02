@@ -11,4 +11,15 @@ dependencies:
       - pre-commit
       - azure-cognitiveservices-speech
       - pytest
+      - langchain
+      - langgraph
+      - soundfile
+      - torchaudio
       - isort
+      - torch
+      - tqdm
+      - e . # Local package
+      - openai
+      - pydantic
+      - fastapi
+      - uvicorn
