@@ -46,12 +46,9 @@ transcripts/
 
 # === Credentials / secrets ===
 .env
-<<<<<<< HEAD
 .env.local
 .env.production
 .env.staging
-=======
->>>>>>> 8bc6f8c (added .env.example)
 secrets.json
 *.key
 *.pem
@@ -118,3 +115,8 @@ user_insights/
 
 # === Temp dirs ===
 temp/sttr_temp
+
+# === Coverage reports ===
+.coverage
+htmlcov/
+coverage.xml

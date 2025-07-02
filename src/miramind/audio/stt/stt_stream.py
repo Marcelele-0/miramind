@@ -8,8 +8,8 @@ from queue import Queue
 
 import scipy
 import sounddevice as sd
-from stt.consts import DURATION, SAMPLE_RATE
-from stt.stt_class import STT
+from miramind.audio.stt.consts import DURATION, SAMPLE_RATE
+from miramind.audio.stt.stt_class import STT
 
 
 def get_short_uuid():

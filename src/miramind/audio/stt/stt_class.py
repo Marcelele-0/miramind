@@ -1,7 +1,7 @@
 import os
 
 from dotenv import load_dotenv
-from shared.utils import S, get_azure_openai_client, msg
+from miramind.shared.utils import S, get_azure_openai_client, msg
 
 
 def get_language_detection_prompt(text):
