@@ -110,3 +110,8 @@ cache/
 # === Analytics / telemetry ===
 emotion_trends/
 user_insights/
+
+# === Coverage reports ===
+.coverage
+htmlcov/
+coverage.xml
