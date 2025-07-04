@@ -73,6 +73,7 @@ def read_blob(target_blob, container, blob_service_client=None, logger=None):
         blob_client = blob_service_client.get_blob_client(container=container, blob=target_blob)
         downloaded_bytes = blob_client.download_blob().readall()
         logger.info(f"Successfully read {target_blob} from {container}.")
+        return downloaded_bytes
     except Exception as e:
         logger.error(f"Error: {e}")
         raise e
