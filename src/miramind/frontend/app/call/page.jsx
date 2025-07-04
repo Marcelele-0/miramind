@@ -81,6 +81,8 @@ export default function CallPage() {
 
       const data = await res.json();
       console.log("API response:", data);
+      console.log("Response text:", data.response_text);
+      console.log("Audio file path:", data.audio_file_path);
 
       const botResponse =
         data.response_text || "No response";
@@ -96,29 +98,110 @@ export default function CallPage() {
       ]);
 
       if (audioRef.current && audioPath) {
-        const audioSrc = `/output.wav?t=${Date.now()}`;
-        audioRef.current.src = audioSrc;
-        audioRef.current.load();
+        // Try multiple audio endpoints with cache busting
+        const timestamp = Date.now();
+        const audioSources = [
+          `/output.wav?t=${timestamp}`,
+          `/api/audio/output.wav?t=${timestamp}`,
+          `/static/output.wav?t=${timestamp}`,
+        ];
 
-        audioRef.current.oncanplay = async () => {
-          startAudioVisualization();
-          try {
-            await audioRef.current.play();
-            setIsPlaying(true);
-          } catch (err) {
-            console.error("Audio play error:", err);
-          }
+        let audioLoaded = false;
 
-          audioRef.current.onended = () => {
-            setIsPlaying(false);
-            if (animationFrameRef.current) {
-              cancelAnimationFrame(
-                animationFrameRef.current
+        const tryLoadAudio = async (sources) => {
+          for (const src of sources) {
+            try {
+              console.log(
+                `Trying to load audio from: ${src}`
               );
+              audioRef.current.src = src;
+              audioRef.current.load();
+
+              // Wait for the audio to load or error
+              await new Promise((resolve, reject) => {
+                const onLoad = () => {
+                  audioRef.current.removeEventListener(
+                    "canplay",
+                    onLoad
+                  );
+                  audioRef.current.removeEventListener(
+                    "error",
+                    onError
+                  );
+                  resolve();
+                };
+
+                const onError = (err) => {
+                  audioRef.current.removeEventListener(
+                    "canplay",
+                    onLoad
+                  );
+                  audioRef.current.removeEventListener(
+                    "error",
+                    onError
+                  );
+                  reject(err);
+                };
+
+                audioRef.current.addEventListener(
+                  "canplay",
+                  onLoad
+                );
+                audioRef.current.addEventListener(
+                  "error",
+                  onError
+                );
+              });
+
+              // If we get here, audio loaded successfully
+              console.log(
+                `✓ Audio loaded successfully from: ${src}`
+              );
+              audioLoaded = true;
+              break;
+            } catch (err) {
+              console.log(
+                `✗ Failed to load audio from ${src}:`,
+                err
+              );
+              continue;
             }
-            setVolume(0);
-          };
+          }
         };
+
+        try {
+          await tryLoadAudio(audioSources);
+
+          if (audioLoaded) {
+            startAudioVisualization();
+            try {
+              await audioRef.current.play();
+              setIsPlaying(true);
+            } catch (err) {
+              console.error("Audio play error:", err);
+            }
+
+            audioRef.current.onended = () => {
+              setIsPlaying(false);
+              if (animationFrameRef.current) {
+                cancelAnimationFrame(
+                  animationFrameRef.current
+                );
+              }
+              setVolume(0);
+            };
+          } else {
+            console.error(
+              "Failed to load audio from any source"
+            );
+          }
+        } catch (err) {
+          console.error("Error loading audio:", err);
+        }
+      } else {
+        console.log(
+          "No audio path provided or audio ref not available"
+        );
       }
     } catch (err) {
       console.error("Error sending message:", err);

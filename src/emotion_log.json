@@ -1,0 +1,14 @@
+[
+  {
+    "input": "Hi im Adam",
+    "emotion": "neutral",
+    "confidence": 0.7,
+    "response": "Hi Adam! It's great to meet you. How are you feeling today?"
+  },
+  {
+    "input": "I want to run away",
+    "emotion": "scared",
+    "confidence": 0.85,
+    "response": "It sounds like you're feeling overwhelmed or upset about something. It's okay to feel that way, and I'm here to listen if you want to share what's on your mind. Can you tell me more about what's happening that makes you feel like running away?"
+  }
+]

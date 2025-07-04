@@ -40,5 +40,17 @@
     "emotion": "neutral",
     "confidence": 0.8,
     "response": "It sounds like you're feeling really tired right now. Have you been having trouble sleeping, or is there something that might be keeping you awake? Sometimes talking about what's on your mind can help."
+  },
+  {
+    "input": "test",
+    "emotion": "neutral",
+    "confidence": 0.0,
+    "response": "Hi there! Is there anything on your mind that you'd like to talk about? I'm here to chat whenever you're ready."
+  },
+  {
+    "input": "Hello, how are you?",
+    "emotion": "neutral",
+    "confidence": 0.0,
+    "response": "Hello! I'm here and ready to chat. How about you? How are you feeling today?"
   }
 ]
