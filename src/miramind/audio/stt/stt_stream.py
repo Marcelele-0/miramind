@@ -8,6 +8,7 @@ from queue import Queue
 
 import scipy
 import sounddevice as sd
+
 from miramind.audio.stt.consts import DURATION, SAMPLE_RATE
 from miramind.audio.stt.stt_class import STT
 
@@ -200,7 +201,7 @@ class STTStream:
                 if verbose:
                     try:
                         self.logger.info(
-                            f"Transcript of {file} completed. Time elapsed: {time.time() - t}.\n Transcript: {transcript["transcript"]}"
+                            f"Transcript of {file} completed. Time elapsed: {time.time() - t}.\n Transcript: {transcript['transcript']}"
                         )
                     except UnicodeEncodeError:
                         self.logger.info(
@@ -218,7 +219,7 @@ class STTStream:
             if verbose:
                 try:
                     self.logger.info(
-                        f"Transcript of {file} completed. Time elapsed: {time.time() - t}.\n Transcript: {transcript["transcript"]}"
+                        f"Transcript of {file} completed. Time elapsed: {time.time() - t}.\n Transcript: {transcript['transcript']}"
                     )
                 except UnicodeEncodeError:
                     self.logger.info(
