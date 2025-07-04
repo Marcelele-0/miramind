@@ -82,48 +82,6 @@ def detect_emotion(state: Dict[str, Any]) -> Dict[str, Any]:
         "chat_history": state.get("chat_history", []) + [{"role": "user", "content": user_input}]
     }
 
-def generate_response(style: str):
-    def responder(state: Dict[str, Any]) -> Dict[str, Any]:
-        user_input = state["user_input"]
-        chat_history = state.get("chat_history", [])
-
-        system_content = (
-            f"You are a {style} non-licensed therapist who supports neurodivergent children in expressing and understanding their feelings. "
-            "Engage with empathy, encouragement, and patience. "
-            "Use age-appropriate, simple language. "
-            "Focus on helping the child explore their emotions and offer gentle guidance. "
-            "Avoid starting every sentence with apologies or statements like 'I understand.' "
-            "Instead, ask open-ended questions and validate the child's experiences in a supportive way."
-        )
-
-        messages = [{"role": "system", "content": system_content}] + chat_history + [{"role": "user", "content": user_input}]
-        reply = call_openai(messages)
-
-        try:
-            audio_bytes = tts_provider.synthesize(json.dumps({
-                "text": reply,
-                "emotion": state.get("emotion", "neutral")
-            }))
-        except Exception as e:
-            logger.error(f"TTS synthesis error: {e}") 
-            audio_bytes = None
-
-        logger.info(
-            f"Input: {user_input} | "
-            f"Emotion: {state.get('emotion', 'neutral')} ({state.get('emotion_confidence', 0.0):.2f}) | "
-            f"Response: {reply}"
-        )
-
-        return {
-            **state,
-            "response": reply,
-            "response_audio": audio_bytes,
-            "chat_history": chat_history + [
-                {"role": "user", "content": user_input},
-                {"role": "assistant", "content": reply}
-            ]
-        }
-    return responder
 
 # --- Main LangGraph ---
 main_graph = StateGraph(dict)
