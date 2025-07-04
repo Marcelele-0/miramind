@@ -1,5 +1,6 @@
 import time
 from queue import Queue
+
 from dotenv import load_dotenv
 
 from miramind.audio.stt.stt_stream import RecordingStream, RecSTTStream, STTStream
@@ -8,6 +9,7 @@ from miramind.audio.stt.stt_stream import RecordingStream, RecSTTStream, STTStre
 def test_recording(mocker):
     load_dotenv()
     # Mock recording and file write
+    mocker.patch("miramind.audio.stt.stt_stream.sounddevice")
     mocker.patch("miramind.audio.stt.stt_stream.sd.rec", return_value=[[0]])
     mocker.patch("miramind.audio.stt.stt_stream.sd.wait")
     mocker.patch("miramind.audio.stt.stt_stream.scipy.io.wavfile.write")
