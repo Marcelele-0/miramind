@@ -36,9 +36,6 @@ dependencies = [
     "pytest",
     "pytest-mock",
     "pytest-cov",
-    "sounddevice",
-    "scipy",
-    "soundfile"
 ]
 
 [tool.setuptools.packages.find]
