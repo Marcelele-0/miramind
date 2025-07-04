@@ -33,7 +33,8 @@ dependencies = [
     # pytest for tests
     "pytest",
     "pytest-cov",
-    "pytest-mock"
+    "pytest-mock",
+    "azure-storage-blob"
 ]
 
 [project.optional-dependencies]
