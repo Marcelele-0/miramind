@@ -47,7 +47,10 @@ def test_recsttstream(mocker):
     load_dotenv()
     # mocking
     mocker.patch("miramind.audio.stt.stt_stream.sd")
-    from miramind.audio.stt.stt_stream import RecSTTStream
+    try:
+        from miramind.audio.stt.stt_stream import RecSTTStream
+    except OSError:
+        pass
 
     mock_stt = mocker.Mock()
     mock_stt.transcribe = mocker.Mock(return_value={"transcript": "Hello!"})
