@@ -1,21 +1,11 @@
+import io
 import logging
 import os
 
-from miramind.shared.utils import S, get_azure_openai_client, msg
+import sounddevice as sd
+import soundfile as sf
 
-
-def get_language_detection_prompt(text):
-    """
-    Hardcoded prompt for language detection.
-    """
-
-    return [
-        msg(
-            S,
-            "Detect language of the following text. Your answer should be one word. Example: english, polish, german.",
-        ),
-        msg(S, f"Text: {text}"),
-    ]
+from miramind.audio.stt.consts import DURATION, SAMPLE_RATE
 
 
 class STT:
@@ -72,11 +62,24 @@ class STT:
         with open(file_path, "rb") as audio_file:
             return self.transcribe_bytes(audio_file)
 
-        # TODO: decide if this part is necessary
-        # response = self.client.chat.completions.create(model=os.environ.get("LANGUAGE_DETECTION_DEPLOYMENT", "04-mini"),
-        #                                                messages=get_language_detection_prompt(transcript.text),)
 
+class LinearListeningSTT(STT):
+    """
+    Linear speech to text class. Subclass of STT. Main use case is calling run method.
+    """
 
-if __name__ == "__main__":
-    stt = STT(client=get_azure_openai_client())
-    print(stt.transcribe("C:/Users/Mikołaj/PythonProjects/miramind/test_output_sad.wav"))
+    def run(self, chunk_duration=DURATION, sample_rate=SAMPLE_RATE):
+        """
+        Main functionality of LinearListeningSTT.
+
+        Args:
+            chunk_duration: duration (in seconds) of listening before transcribing recorded sound (default 5s).
+            sample_rate: recording's sample rate (default 44100).
+        """
+        audio = sd.rec(int(chunk_duration * sample_rate), samplerate=sample_rate, channels=1)
+        sd.wait()
+        buffer = io.BytesIO()
+        buffer.name = f"{__name__}.wav"
+        sf.write(buffer, audio, samplerate=sample_rate, format='WAV')
+        buffer.seek(0)
+        return self.transcribe_bytes(buffer)
