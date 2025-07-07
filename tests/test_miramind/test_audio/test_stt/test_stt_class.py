@@ -26,5 +26,5 @@ def test_linear_stt(mocker):
     mock_azure_openai_client.audio.transcriptions.create.return_value = mock_transcript
 
     llstt = LinearListeningSTT(client=mock_azure_openai_client)
-    result = llstt.run()
+    result = llstt.run(chunk_duration=10000)
     assert result["transcript"] == "fake transcript"

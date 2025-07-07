@@ -68,12 +68,12 @@ class LinearListeningSTT(STT):
     Linear speech to text class. Subclass of STT. Main use case is calling run method.
     """
 
-    def run(self, chunk_duration=DURATION, sample_rate=SAMPLE_RATE):
+    def run(self, chunk_duration, sample_rate=SAMPLE_RATE):
         """
         Main functionality of LinearListeningSTT.
 
         Args:
-            chunk_duration: duration (in seconds) of listening before transcribing recorded sound (default 5s).
+            chunk_duration: duration (in seconds) of listening before transcribing recorded sound.
             sample_rate: recording's sample rate (default 44100).
         """
         audio = sd.rec(int(chunk_duration * sample_rate), samplerate=sample_rate, channels=1)
@@ -83,3 +83,14 @@ class LinearListeningSTT(STT):
         sf.write(buffer, audio, samplerate=sample_rate, format='WAV')
         buffer.seek(0)
         return self.transcribe_bytes(buffer)
+
+    """
+    Example use case:
+
+    llstt = LinearListeningSTT(client=get_azure_openai_client()) # easiest way to get client, but any other will do.
+    transcript = llstt.run(duration=10, sample_rate=44100)
+
+    Running this will pause for 10 sec and return transcript of what was recorded during that time.
+    Warning: it may be slow.
+
+    """
