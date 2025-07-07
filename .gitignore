@@ -38,7 +38,6 @@ pip-wheel-metadata/
 *.mp3
 *.ogg
 *.m4a
-*.m4a
 audio_cache/
 tts_output/
 whisper_output/
