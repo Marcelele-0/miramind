@@ -19,10 +19,11 @@ from miramind.llm.langgraph.subgraphs import (
     build_gentle_flow,
     build_neutral_flow
 )
-from miramind.llm.langgraph.utils import (
-    call_openai,
-    logger,
-)
+from miramind.llm.langgraph.utils import call_openai
+from miramind.shared.logger import logger  
+
+logger.info("Logger is working inside chatbot.py")
+
 
 # --- Config ---
 DEFAULT_MODEL = "gpt-4o"
@@ -57,6 +58,7 @@ parser = JsonOutputParser(pydantic_schema=EmotionSchema)
 
 # --- Core Nodes ---
 def detect_emotion(state: Dict[str, Any]) -> Dict[str, Any]:
+    logger.info("detect_emotion was called")
     user_input = state["user_input"]
 
     messages = [
@@ -68,12 +70,15 @@ def detect_emotion(state: Dict[str, Any]) -> Dict[str, Any]:
     emotion, confidence = "neutral", 0.0
 
     try:
-        parsed = parser.parse(raw)
-        if parsed.emotion in VALID_EMOTIONS:
-            emotion = parsed.emotion
-            confidence = parsed.confidence
-    except Exception as e:
-        logger.log_error("Emotion parsing failed", error=str(e), raw_response=raw)
+
+        match = re.search(r'{.*}', raw, re.DOTALL)
+        if match:
+            parsed = EmotionResult.parse_raw(match.group(0))
+            if parsed.emotion in VALID_EMOTIONS:
+                emotion = parsed.emotion
+                confidence = parsed.confidence
+    except ValidationError as e:
+        logger.error(f"Emotion parsing error: {e}")  
 
     return {
         **state,
@@ -96,6 +101,7 @@ def generate_response(style: str):
             "Instead, ask open-ended questions and validate the child's experiences in a supportive way."
         )
 
+
         # --- Trim messages ---
         formatted_chat = []
         for msg in chat_history:
@@ -111,6 +117,7 @@ def generate_response(style: str):
             messages.append({"role": msg.type, "content": msg.content})
         messages.append({"role": "user", "content": user_input})
 
+
         reply = call_openai(messages)
 
         try:
@@ -119,14 +126,13 @@ def generate_response(style: str):
                 "emotion": state.get("emotion", "neutral")
             }))
         except Exception as e:
-            print(f"TTS synthesis error: {e}")
+            logger.error(f"TTS synthesis error: {e}") 
             audio_bytes = None
 
-        logger.log(
-            input_text=user_input,
-            emotion=state.get("emotion", "neutral"),
-            confidence=state.get("emotion_confidence", 0.0),
-            response_text=reply
+        logger.info(
+            f"Input: {user_input} | "
+            f"Emotion: {state.get('emotion', 'neutral')} ({state.get('emotion_confidence', 0.0):.2f}) | "
+            f"Response: {reply}"
         )
 
         return {
