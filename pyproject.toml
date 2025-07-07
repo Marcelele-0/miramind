@@ -70,9 +70,9 @@ known_first_party = ["miramind"]
     AZURE_OPENAI_API_VERSION = {value = "2024-12-01-preview", skip_if_set = true}
 
     #AZURE SPEECH
-    AZURE_SPEECH_VOICE_NAME = {value = "en-US-JennyNeural", skip_if_set = true}
-    AZURE_SPEECH_ENDPOINT = {value = "https://YOURRESURCE.cognitiveservices.azure.com/", skip_if_set = true}
-    AZURE_SPEECH_KEY = {value = "YOUR KEY", skip_if_set = true}
+    #AZURE_SPEECH_VOICE_NAME = {value = "en-US-JennyNeural", skip_if_set = true}
+    #AZURE_SPEECH_ENDPOINT = {value = "https://YOURRESURCE.cognitiveservices.azure.com/", skip_if_set = true}
+    #AZURE_SPEECH_KEY = {value = "YOUR KEY", skip_if_set = true}
 
     #PROJECT DIRS
     TESTS_DIR = {value = "~/tests", skip_if_set = true}
