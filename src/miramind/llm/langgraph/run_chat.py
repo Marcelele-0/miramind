@@ -5,7 +5,6 @@ import os
 from miramind.shared.logger import logger
 logger.info("Logger works inside run_chat.py")
 
-
 # Define the path where the output.wav should be saved inside frontend/public
 OUTPUT_AUDIO_PATH = os.path.join(os.path.dirname(__file__), "..", "..", "frontend", "public", "output.wav")
 OUTPUT_AUDIO_PATH = os.path.abspath(OUTPUT_AUDIO_PATH)

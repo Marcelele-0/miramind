@@ -34,6 +34,9 @@ class AzureTTSProvider(TTSProvider):
             'angry': 'calm',
             'assistant': 'assistant',
             'cheerful': 'cheerful',
+            'calm': 'calm',
+            'conversational': 'conversational',
+            'angry': 'calm',
             'chat': 'chat',
             'excited': 'excited',
             'friendly': 'friendly',
@@ -160,3 +163,4 @@ class AzureTTSProvider(TTSProvider):
         '''
 
         return ssml.strip()
+    

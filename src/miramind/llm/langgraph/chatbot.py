@@ -1,13 +1,15 @@
 # --- Imports ---
 import os
 import json
-import re
 from typing import List, Dict, Any
 from dotenv import load_dotenv
-from pydantic import BaseModel, ValidationError
+from pydantic import ValidationError
 from langgraph.graph import StateGraph, END
 from langchain_core.runnables import RunnableLambda
 from openai import OpenAI
+from langchain_core.output_parsers import JsonOutputParser
+from langchain_core.pydantic_v1 import BaseModel
+from langchain_core.messages import HumanMessage, AIMessage, trim_messages
 
 from miramind.audio.tts.tts_factory import get_tts_provider
 from miramind.llm.langgraph.subgraphs import (
@@ -48,9 +50,11 @@ def initialize_clients():
 client, tts_provider = initialize_clients()
 
 # --- Models ---
-class EmotionResult(BaseModel):
+class EmotionSchema(BaseModel):
     emotion: str
     confidence: float
+
+parser = JsonOutputParser(pydantic_schema=EmotionSchema)
 
 # --- Core Nodes ---
 def detect_emotion(state: Dict[str, Any]) -> Dict[str, Any]:
@@ -66,6 +70,7 @@ def detect_emotion(state: Dict[str, Any]) -> Dict[str, Any]:
     emotion, confidence = "neutral", 0.0
 
     try:
+
         match = re.search(r'{.*}', raw, re.DOTALL)
         if match:
             parsed = EmotionResult.parse_raw(match.group(0))
@@ -73,7 +78,7 @@ def detect_emotion(state: Dict[str, Any]) -> Dict[str, Any]:
                 emotion = parsed.emotion
                 confidence = parsed.confidence
     except ValidationError as e:
-        logger.error(f"Emotion parsing error: {e}")  # ✅ Replaced print with logger
+        logger.error(f"Emotion parsing error: {e}")  
 
     return {
         **state,
@@ -96,7 +101,23 @@ def generate_response(style: str):
             "Instead, ask open-ended questions and validate the child's experiences in a supportive way."
         )
 
-        messages = [{"role": "system", "content": system_content}] + chat_history + [{"role": "user", "content": user_input}]
+
+        # --- Trim messages ---
+        formatted_chat = []
+        for msg in chat_history:
+            if msg["role"] == "user":
+                formatted_chat.append(HumanMessage(content=msg["content"]))
+            elif msg["role"] == "assistant":
+                formatted_chat.append(AIMessage(content=msg["content"]))
+
+        trimmed_chat = trim_messages(formatted_chat)
+
+        messages = [{"role": "system", "content": system_content}]
+        for msg in trimmed_chat:
+            messages.append({"role": msg.type, "content": msg.content})
+        messages.append({"role": "user", "content": user_input})
+
+
         reply = call_openai(messages)
 
         try:
