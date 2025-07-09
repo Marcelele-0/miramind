@@ -1,7 +1,9 @@
 # miramind
 
-## src
+pip install -e .
 
+## src
+uvicorn miramind.api.main:app --reload
 ### scr/miramind
 
 #### src/miramind/stt
@@ -9,6 +11,11 @@
 - STT.transcribe(file) -> dict: returns dictionary with "transcript" keywords.
 
 #### src/miramind/shared
+
+### src/miramind/frontend
+npm install
+npm run dev
+
 
 ##### scr/miramind/shared/utils
 
@@ -36,3 +43,4 @@ CLI tool used to download YouTube videos as audio. Save directory depends on .en
 ``` bash
 ytd -url "example url" -name "output file name"
 ```
+

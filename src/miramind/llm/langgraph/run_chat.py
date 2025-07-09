@@ -1,11 +1,19 @@
-from miramind.llm.langgraph.chatbot import chatbot
-import sys
 import json
 import os
+import sys
+
+from miramind.llm.langgraph.chatbot import chatbot
+from miramind.shared.logger import logger
+
+logger.info("Logger works inside run_chat.py")
+
 
 # Define the path where the output.wav should be saved inside frontend/public
-OUTPUT_AUDIO_PATH = os.path.join(os.path.dirname(__file__), "..", "..", "frontend", "public", "output.wav")
+OUTPUT_AUDIO_PATH = os.path.join(
+    os.path.dirname(__file__), "..", "..", "frontend", "public", "output.wav"
+)
 OUTPUT_AUDIO_PATH = os.path.abspath(OUTPUT_AUDIO_PATH)
+
 
 def process_chat_message(user_input_text: str, chat_history: list = [], memory: str = ""):
     """
@@ -19,11 +27,7 @@ def process_chat_message(user_input_text: str, chat_history: list = [], memory: 
     Returns:
         A dictionary containing 'response_text', 'audio_file_path', and updated memory.
     """
-    state = {
-        "chat_history": chat_history,
-        "user_input": user_input_text,
-        "memory": memory
-    }
+    state = {"chat_history": chat_history, "user_input": user_input_text, "memory": memory}
 
     try:
         state = chatbot.invoke(state)
@@ -36,29 +40,29 @@ def process_chat_message(user_input_text: str, chat_history: list = [], memory: 
             os.makedirs(os.path.dirname(OUTPUT_AUDIO_PATH), exist_ok=True)
             with open(OUTPUT_AUDIO_PATH, "wb") as f:
                 f.write(audio_data)
-            print(f" Response audio saved to {OUTPUT_AUDIO_PATH}")
+            # print(f" Response audio saved to {OUTPUT_AUDIO_PATH}")
             return {
                 "response_text": response_text,
                 "audio_file_path": OUTPUT_AUDIO_PATH,
-                "memory": updated_memory
+                "memory": updated_memory,
             }
         else:
-            print(" No audio generated.")
+            # print(" No audio generated.")
             return {
                 "response_text": response_text,
                 "audio_file_path": None,
-                "memory": updated_memory
+                "memory": updated_memory,
             }
     except Exception as e:
         print(f"Error processing chat message: {e}", file=sys.stderr)
         return {
             "response_text": "I'm sorry, I couldn't process that.",
             "audio_file_path": None,
-            "memory": memory
+            "memory": memory,
         }
 
+
 def main():
-    # This block allows run_chat.py to be called from the command line with JSON input
     if len(sys.argv) > 1:
         try:
             input_data = json.loads(sys.argv[1])
@@ -96,7 +100,9 @@ def main():
             memory = result.get("memory", memory)
 
             if result["audio_file_path"]:
+                logger.info(f"Audio file saved")
                 print(f" Audio saved to {result['audio_file_path']}")
+
 
 if __name__ == "__main__":
     main()
