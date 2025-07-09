@@ -3,6 +3,7 @@ from typing import Callable, Dict
 
 from dotenv import load_dotenv
 
+from ...shared.logger import logger
 from .tts_azure import AzureTTSProvider
 from .tts_base import TTSProvider
 
@@ -33,6 +34,7 @@ def get_tts_provider(name: str = "azure") -> TTSProvider:
 
     # Load environment variables
     load_dotenv()
+    logger.debug("Environment variables loaded for TTS provider factory.")
 
     provider_registry: Dict[str, Callable[[], TTSProvider]] = {
         "azure": lambda: AzureTTSProvider(
@@ -45,8 +47,10 @@ def get_tts_provider(name: str = "azure") -> TTSProvider:
 
     if name not in provider_registry:
         supported_providers = ", ".join(provider_registry.keys())
+        logger.error(f"Unknown TTS provider: '{name}'. Supported providers: {supported_providers}")
         raise ValueError(
             f"Unknown TTS provider: '{name}'. " f"Supported providers: {supported_providers}"
         )
 
+    logger.debug(f"Instantiating TTS provider: {name}")
     return provider_registry[name]()

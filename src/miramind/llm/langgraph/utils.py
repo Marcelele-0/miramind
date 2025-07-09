@@ -47,12 +47,61 @@ class EmotionLogger:
 
 
 # --- API Helper ---
-def call_openai(client: OpenAI, messages: List[Dict[str, str]], model: str = DEFAULT_MODEL) -> str:
+def call_openai(
+    client: OpenAI,
+    messages: List[Dict[str, str]],
+    model: str = DEFAULT_MODEL,
+    max_tokens: int = None,
+    temperature: float = 0.7,
+) -> str:
+    """
+    Optimized OpenAI API call with better error handling and performance settings.
+    """
     try:
-        response = client.chat.completions.create(model=model, messages=messages)
+        # Add performance optimizations
+        response = client.chat.completions.create(
+            model=model,
+            messages=messages,
+            max_tokens=max_tokens,
+            temperature=temperature,
+            stream=False,  # Disable streaming for faster single responses
+            timeout=10.0,  # Add timeout to prevent hanging
+        )
         return response.choices[0].message.content.strip()
     except Exception as e:
-        print(f"OpenAI API error: {e}")
+        logger.error(f"OpenAI API error: {e}")
+        return ""
+
+
+async def call_openai_async(
+    client: OpenAI,
+    messages: List[Dict[str, str]],
+    model: str = DEFAULT_MODEL,
+    max_tokens: int = None,
+    temperature: float = 0.7,
+) -> str:
+    """
+    Async version of OpenAI API call for better concurrency.
+    """
+    try:
+        # Use asyncio to run in executor for true async behavior
+        import asyncio
+
+        loop = asyncio.get_event_loop()
+        response = await loop.run_in_executor(
+            None,
+            lambda: client.chat.completions.create(
+                model=model,
+                messages=messages,
+                max_tokens=max_tokens,
+                temperature=temperature,
+                stream=False,
+                timeout=10.0,
+            ),
+        )
+        return response.choices[0].message.content.strip()
+    except Exception as e:
+        logger.error(f"OpenAI API error (async): {e}")
         return ""
 
 
@@ -65,35 +114,78 @@ def generate_response(style: str, client: OpenAI, tts_provider, emotion_logger: 
 
         system_content = (
             f"You are a {style} non-licensed therapist who helps neurodivergent children talk about their feelings. "
-            "Don't start every sentence by saying you're sorry or that you understand."
+            "Don't start every sentence by saying you're sorry or that you understand. "
+            "Keep responses concise and engaging."  # Added for faster processing
         )
 
         messages = (
             [{"role": "system", "content": system_content}]
-            + chat_history
+            + chat_history[-4:]  # Limit context to last 4 messages for faster processing
             + [{"role": "user", "content": user_input}]
         )
-        reply = call_openai(client, messages)
+        reply = call_openai(client, messages, max_tokens=150, temperature=0.7)
+
+        # Map emotions to TTS-supported emotions
+        emotion_mapping = {
+            "anxious": "scared",
+            "embarrassed": "neutral",
+            "excited": "excited",
+            "happy": "happy",
+            "sad": "sad",
+            "angry": "angry",
+            "scared": "scared",
+            "neutral": "neutral",
+        }
+
+        detected_emotion = state.get("emotion", "neutral")
+        tts_emotion = emotion_mapping.get(detected_emotion, "neutral")
 
         try:
-            audio_bytes = tts_provider.synthesize(
-                json.dumps({"text": reply, "emotion": state.get("emotion", "neutral")})
-            )
+            # Use async TTS if available
+            if hasattr(tts_provider, 'synthesize_async'):
+                import asyncio
+
+                try:
+                    loop = asyncio.get_event_loop()
+                    audio_bytes = loop.run_until_complete(
+                        tts_provider.synthesize_async(
+                            json.dumps({"text": reply, "emotion": tts_emotion})
+                        )
+                    )
+                except RuntimeError:
+                    # Fallback to sync if no event loop
+                    audio_bytes = tts_provider.synthesize(
+                        json.dumps({"text": reply, "emotion": tts_emotion})
+                    )
+            else:
+                audio_bytes = tts_provider.synthesize(
+                    json.dumps({"text": reply, "emotion": tts_emotion})
+                )
         except Exception as e:
-            print(f"TTS synthesis error: {e}")
+            logger.error(f"TTS synthesis error: {e}")
             audio_bytes = None
 
-        emotion_logger.log(
-            input_text=user_input,
-            emotion=state.get("emotion", "neutral"),
-            confidence=state.get("emotion_confidence", 0.0),
-            response_text=reply,
-        )
+        # Async logging to avoid blocking
+        try:
+            import threading
+
+            log_thread = threading.Thread(
+                target=emotion_logger.log,
+                args=(
+                    user_input,
+                    state.get("emotion", "neutral"),
+                    state.get("emotion_confidence", 0.0),
+                    reply,
+                ),
+            )
+            log_thread.daemon = True
+            log_thread.start()
+        except Exception as e:
+            logger.error(f"Logging error: {e}")
         logger.info(
-            input_text=user_input,
-            emotion=state.get("emotion", "neutral"),
-            confidence=state.get("emotion_confidence", 0.0),
-            response_text=reply,
+            f"Response generated - Emotion: {state.get('emotion', 'neutral')}, "
+            f"Confidence: {state.get('emotion_confidence', 0.0)}, "
+            f"Input: {user_input[:50]}{'...' if len(user_input) > 50 else ''}"
         )
 
         return {

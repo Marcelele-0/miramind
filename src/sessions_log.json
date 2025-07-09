@@ -52,5 +52,85 @@
         "botResponse": "Aw, I'm so glad you liked it! Pickle is one of my favorites—I think she's kind of inspiring, right? If you ever feel like Pickle, just remember that even little steps can make a big difference. Would you like to hear another story, or maybe talk about how you're feeling today?"
       }
     ]
+  },
+  {
+    "sessionId": "e9423a2f-bc17-4920-8e1f-ac42307e4b81",
+    "startTime": "2025-07-10T12:35:06.423379",
+    "messages": [
+      {
+        "timestamp": "2025-07-10T12:35:24.548980",
+        "userInput": "Hi how are you?",
+        "emotion": "neutral",
+        "confidence": 0.8,
+        "botResponse": "Hello! I'm here and ready to listen to you. How are you feeling today?"
+      },
+      {
+        "timestamp": "2025-07-10T12:35:55.547150",
+        "userInput": "my name is Adam",
+        "emotion": "neutral",
+        "confidence": 0.0,
+        "botResponse": "Hi Adam! It's really nice to meet you. What's on your mind today?"
+      },
+      {
+        "timestamp": "2025-07-10T12:36:10.662771",
+        "userInput": "what is my name?",
+        "emotion": "neutral",
+        "confidence": 0.0,
+        "botResponse": "Your name is Adam! How are you feeling right now?"
+      },
+      {
+        "timestamp": "2025-07-10T12:36:25.195289",
+        "userInput": "im fine",
+        "emotion": "neutral",
+        "confidence": 0.85,
+        "botResponse": "I'm glad to hear that. Is there anything you'd like to talk about or explore together?"
+      }
+    ]
+  },
+  {
+    "sessionId": "1b79baf3-0054-41f1-812d-43c04f4e74a4",
+    "startTime": "2025-07-10T12:38:59.042803",
+    "messages": [
+      {
+        "timestamp": "2025-07-10T12:39:09.120656",
+        "userInput": "Hi there",
+        "emotion": "neutral",
+        "confidence": 0.8,
+        "botResponse": "Hello! How are you feeling today?"
+      },
+      {
+        "timestamp": "2025-07-10T12:39:25.559130",
+        "userInput": "im fine",
+        "emotion": "neutral",
+        "confidence": 0.8,
+        "botResponse": "It's okay to say more if you want to. Is there something specific on your mind, or something you're excited or worried about?"
+      }
+    ]
+  },
+  {
+    "sessionId": "21dac21e-750f-4689-8651-758d76be8846",
+    "startTime": "2025-07-10T12:48:15.283998",
+    "messages": [
+      {
+        "timestamp": "2025-07-10T12:48:27.200174",
+        "userInput": "Hi im Adam",
+        "emotion": "neutral",
+        "confidence": 0.0,
+        "botResponse": "Hi Adam! It's great to meet you. How are you feeling today?"
+      }
+    ]
+  },
+  {
+    "sessionId": "4b1d7b52-f785-4783-b87c-b8db64d588ed",
+    "startTime": "2025-07-10T12:50:10.239432",
+    "messages": [
+      {
+        "timestamp": "2025-07-10T12:50:23.315481",
+        "userInput": "Hi how are you?",
+        "emotion": "neutral",
+        "confidence": 0.0,
+        "botResponse": "Hello! I'm here and ready to chat with you. How are you feeling today?"
+      }
+    ]
   }
 ]

@@ -1,11 +1,32 @@
+import asyncio
+import hashlib
 import json
 import os
 import sys
+from concurrent.futures import ThreadPoolExecutor
+from functools import lru_cache
+from typing import Optional
 
 from miramind.llm.langgraph.chatbot import chatbot
+from miramind.llm.langgraph.performance_monitor import get_performance_monitor
 from miramind.shared.logger import logger
 
 logger.info("Logger works inside run_chat.py")
+
+# Performance monitor
+perf_monitor = get_performance_monitor()
+
+# Thread pool for CPU-bound tasks
+executor = ThreadPoolExecutor(max_workers=2)
+
+# Simple cache for repeated requests
+response_cache = {}
+
+
+def _hash_input(user_input: str, emotion: str = "neutral") -> str:
+    """Create a hash key for caching responses."""
+    content = f"{user_input.lower().strip()}_{emotion}"
+    return hashlib.md5(content.encode()).hexdigest()
 
 
 # Define the path where the output.wav should be saved inside frontend/public
@@ -18,48 +39,105 @@ OUTPUT_AUDIO_PATH = os.path.abspath(OUTPUT_AUDIO_PATH)
 def process_chat_message(user_input_text: str, chat_history: list = [], memory: str = ""):
     """
     Processes a single chat message using the chatbot and saves the response audio.
+    Now with performance monitoring and caching.
+    """
+    with perf_monitor.track_operation("total_chat_processing"):
+        state = {"chat_history": chat_history, "user_input": user_input_text, "memory": memory}
 
-    Args:
-        user_input_text: The text message from the user.
-        chat_history: A list of previous chat turns (optional, for continuity).
-        memory: A string summarizing persistent user context.
+        # Check cache first
+        with perf_monitor.track_operation("cache_lookup"):
+            cache_key = _hash_input(user_input_text)
+            if cache_key in response_cache:
+                logger.info(f"Cache hit for key: {cache_key}")
+                return response_cache[cache_key]
 
-    Returns:
-        A dictionary containing 'response_text', 'audio_file_path', and updated memory.
+        try:
+            with perf_monitor.track_operation("chatbot_invoke"):
+                state = chatbot.invoke(state)
+
+            response_text = state.get("response")
+            audio_data = state.get("response_audio")
+            updated_memory = state.get("memory", "")
+
+            if audio_data:
+                with perf_monitor.track_operation("audio_file_save"):
+                    os.makedirs(os.path.dirname(OUTPUT_AUDIO_PATH), exist_ok=True)
+                    with open(OUTPUT_AUDIO_PATH, "wb") as f:
+                        f.write(audio_data)
+                logger.info(f" Response audio saved to {OUTPUT_AUDIO_PATH}")
+                result = {
+                    "response_text": response_text,
+                    "audio_file_path": OUTPUT_AUDIO_PATH,
+                    "memory": updated_memory,
+                }
+            else:
+                logger.info(" No audio generated.")
+                result = {
+                    "response_text": response_text,
+                    "audio_file_path": None,
+                    "memory": updated_memory,
+                }
+
+            # Update cache
+            with perf_monitor.track_operation("cache_update"):
+                response_cache[cache_key] = result
+                logger.info(f"Response cached with key: {cache_key}")
+
+            return result
+        except Exception as e:
+            logger.error(f"Error processing chat message: {e}")
+            return {
+                "response_text": "I'm sorry, I couldn't process that.",
+                "audio_file_path": None,
+                "memory": memory,
+            }
+
+
+async def process_chat_message_async(
+    user_input_text: str, chat_history: list = [], memory: str = ""
+):
+    """
+    Async version of process_chat_message for better performance.
     """
     state = {"chat_history": chat_history, "user_input": user_input_text, "memory": memory}
 
     try:
-        state = chatbot.invoke(state)
+        # Run chatbot processing in thread pool to avoid blocking
+        loop = asyncio.get_event_loop()
+        state = await loop.run_in_executor(executor, chatbot.invoke, state)
 
         response_text = state.get("response")
         audio_data = state.get("response_audio")
         updated_memory = state.get("memory", "")
 
         if audio_data:
-            os.makedirs(os.path.dirname(OUTPUT_AUDIO_PATH), exist_ok=True)
-            with open(OUTPUT_AUDIO_PATH, "wb") as f:
-                f.write(audio_data)
-            # print(f" Response audio saved to {OUTPUT_AUDIO_PATH}")
+            # Run file I/O in thread pool
+            await loop.run_in_executor(executor, _save_audio_file, audio_data)
             return {
                 "response_text": response_text,
                 "audio_file_path": OUTPUT_AUDIO_PATH,
                 "memory": updated_memory,
             }
         else:
-            # print(" No audio generated.")
             return {
                 "response_text": response_text,
                 "audio_file_path": None,
                 "memory": updated_memory,
             }
     except Exception as e:
-        print(f"Error processing chat message: {e}", file=sys.stderr)
+        logger.error(f"Error processing chat message: {e}")
         return {
             "response_text": "I'm sorry, I couldn't process that.",
             "audio_file_path": None,
             "memory": memory,
         }
+
+
+def _save_audio_file(audio_data: bytes) -> None:
+    """Helper function to save audio file."""
+    os.makedirs(os.path.dirname(OUTPUT_AUDIO_PATH), exist_ok=True)
+    with open(OUTPUT_AUDIO_PATH, "wb") as f:
+        f.write(audio_data)
 
 
 def main():
@@ -90,6 +168,8 @@ def main():
             user_input = input("Child: ").strip()
             if user_input.lower() in {"exit", "quit"}:
                 print("Chatbot: It was great talking to you. Bye!")
+                # Print performance statistics before exiting
+                perf_monitor.print_stats()
                 break
 
             result = process_chat_message(user_input, current_chat_history, memory)
@@ -102,6 +182,11 @@ def main():
             if result["audio_file_path"]:
                 logger.info(f"Audio file saved")
                 print(f" Audio saved to {result['audio_file_path']}")
+
+        # Show performance stats every 10 requests in interactive mode
+        request_count = len(perf_monitor.metrics.get("total_chat_processing", []))
+        if request_count > 0 and request_count % 10 == 0:
+            perf_monitor.print_stats()
 
 
 if __name__ == "__main__":
