@@ -1,6 +1,5 @@
 from abc import ABC, abstractmethod
 
-
 class TTSProvider(ABC):
     """
     Abstract base class for all Text-to-Speech providers.
