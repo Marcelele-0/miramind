@@ -36,7 +36,9 @@ dependencies = [
     "pytest",
     "pytest-mock",
     "pytest-cov",
-    "pytest-env"
+    "pytest-env",
+    "pytest-mock",
+    "azure-storage-blob"
 ]
 
 [tool.setuptools.packages.find]
