@@ -26,10 +26,14 @@ classifiers = [
 ]
 
 dependencies = [
-    # Current minimal dependencies (matching environment.yaml)
     "python-dotenv>=1.0.0",
-    # Azure TTS dependencies
+    "openai",
+    "pytubefix",
+    "sounddevice",
+    "scipy",
+    "soundfile",
     "azure-cognitiveservices-speech>=1.34.0",
+
     # FastAPI dependencies
     "fastapi>=0.104.0",
     "uvicorn[standard]>=0.24.0",
@@ -41,7 +45,18 @@ dependencies = [
     "langchain-core>=0.1.0",
     "langgraph>=0.0.40",
     # pytest for tests
+
     "pytest",
+    "pytest-mock",
+    "pytest-cov",
+    "pytest-env",
+    "pytest-mock",
+    "azure-storage-blob"
+]
+
+[tool.setuptools.packages.find]
+where = [
+    "src"
 ]
 
 [project.optional-dependencies]
@@ -61,3 +76,30 @@ force_grid_wrap = 0
 use_parentheses = true
 ensure_newline_before_comments = true
 known_first_party = ["miramind"]
+
+# pytest env setup
+[tool.pytest_env]
+    AZURE_OPENAI_API_KEY = {value = "YOUR KEY", skip_if_set = true}
+    AZURE_OPENAI_ENDPOINT_URL = {value = "YOUR ENDPOINT", skip_if_set = true}
+    AZURE_OPENAI_API_VERSION = {value = "2024-12-01-preview", skip_if_set = true}
+
+    #AZURE SPEECH
+    #AZURE_SPEECH_VOICE_NAME = {value = "en-US-JennyNeural", skip_if_set = true}
+    #AZURE_SPEECH_ENDPOINT = {value = "https://YOURRESURCE.cognitiveservices.azure.com/", skip_if_set = true}
+    #AZURE_SPEECH_KEY = {value = "YOUR KEY", skip_if_set = true}
+
+    #PROJECT DIRS
+    TESTS_DIR = {value = "~/tests", skip_if_set = true}
+    LOGS_DIR = {value = "~/logs", skip_if_set = true}
+    MIRAMIND_TEMP = {value = "~/temp", skip_if_set = true}
+
+    #MODEL DEPLOYMENTS
+    STT_MODEL = {value = "gpt-4o-transcribe", skip_if_set = true}
+    LANGUAGE_DETECTION_DEPLOYMENT = {value = "o4-mini", skip_if_set = true}
+
+    #BLOB STORAGE
+    BLOB_STORAGE_CONNECTION_STRING = {value = "YOUR CONNECTION STRING", skip_if_set = true}
+
+# CLI entry point (if you want a command-line tool)
+[project.scripts]
+ytd = "scripts.downloader.ytd:main"

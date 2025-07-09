@@ -1,8 +1,7 @@
-import os
-import sys
-from abc import ABC
-
 import pytest
+from abc import ABC
+import sys
+import os
 
 # Add src to path for imports
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", "..", ".."))
@@ -20,14 +19,13 @@ class TestTTSProviderAbstract:
 
     def test_concrete_implementation_works(self):
         """Test that concrete implementation can be created and used."""
-
         class MockTTSProvider(TTSProvider):
             def synthesize(self, input_json: str) -> bytes:
                 return b"fake_audio_data"
-
+            
             def set_emotion(self, engine, emotion: str) -> None:
                 pass
-
+        
         # Should be able to create and use
         provider = MockTTSProvider()
         result = provider.synthesize('{"text": "test"}')
@@ -36,12 +34,10 @@ class TestTTSProviderAbstract:
 
     def test_incomplete_implementation_fails(self):
         """Test that incomplete implementation cannot be instantiated."""
-
         class IncompleteTTSProvider(TTSProvider):
             def synthesize(self, input_json: str) -> bytes:
                 return b"test"
-
             # Missing set_emotion method
-
+        
         with pytest.raises(TypeError):
             IncompleteTTSProvider()

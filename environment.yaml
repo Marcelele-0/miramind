@@ -18,3 +18,10 @@ dependencies:
       - torch
       - tqdm
       - isort
+      - torch
+      - tqdm
+      - e . # Local package
+      - openai
+      - pydantic
+      - fastapi
+      - uvicorn
