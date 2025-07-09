@@ -1,15 +1,18 @@
 """
 Test script to verify the FastAPI endpoint is working correctly.
 """
-import requests
+
 import json
 import time
 
+import requests
+
+
 def test_api():
     base_url = "http://localhost:8000"
-    
+
     print("Testing FastAPI endpoints...")
-    
+
     # Test basic endpoint
     try:
         response = requests.get(f"{base_url}/api/test")
@@ -17,7 +20,7 @@ def test_api():
     except Exception as e:
         print(f"✗ Test endpoint failed: {e}")
         return
-    
+
     # Test chat start
     try:
         response = requests.post(f"{base_url}/api/chat/start")
@@ -25,21 +28,17 @@ def test_api():
     except Exception as e:
         print(f"✗ Chat start failed: {e}")
         return
-    
+
     # Test chat message
     try:
-        payload = {
-            "userInput": "Hello, how are you?",
-            "chatHistory": [],
-            "memory": ""
-        }
-        
+        payload = {"userInput": "Hello, how are you?", "chatHistory": [], "memory": ""}
+
         print(f"Sending payload: {payload}")
         response = requests.post(f"{base_url}/api/chat/message", json=payload, timeout=30)
-        
+
         print(f"Response status: {response.status_code}")
         print(f"Response headers: {dict(response.headers)}")
-        
+
         if response.status_code == 200:
             data = response.json()
             print(f"✓ Chat message successful:")
@@ -49,9 +48,10 @@ def test_api():
         else:
             print(f"✗ Chat message failed: {response.status_code}")
             print(f"  Error: {response.text}")
-            
+
     except Exception as e:
         print(f"✗ Chat message failed: {e}")
+
 
 if __name__ == "__main__":
     test_api()

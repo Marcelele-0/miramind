@@ -1,6 +1,7 @@
 """
 Constants for the MiraMind API
 """
+
 import os
 
 # Path to frontend public directory for static files

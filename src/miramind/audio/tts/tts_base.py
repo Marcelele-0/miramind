@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 
+
 class TTSProvider(ABC):
     """
     Abstract base class for all Text-to-Speech providers.
@@ -44,4 +45,3 @@ class TTSProvider(ABC):
             NotImplementedError: If the method is not implemented by subclass
         """
         pass
-    

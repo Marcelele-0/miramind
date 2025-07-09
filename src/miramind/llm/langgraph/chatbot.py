@@ -1,24 +1,25 @@
 # --- Imports ---
-import os
 import json
+import os
 import re
-from typing import List, Dict, Any
+from typing import Any, Dict, List
+
 from dotenv import load_dotenv
-from pydantic import BaseModel, ValidationError
-from langgraph.graph import StateGraph, END
 from langchain_core.runnables import RunnableLambda
+from langgraph.graph import END, StateGraph
 from openai import OpenAI
+from pydantic import BaseModel, ValidationError
 
 from miramind.audio.tts.tts_factory import get_tts_provider
 from miramind.llm.langgraph.subgraphs import (
-    build_sad_flow,
     build_angry_flow,
     build_excited_flow,
     build_gentle_flow,
-    build_neutral_flow
+    build_neutral_flow,
+    build_sad_flow,
 )
 from miramind.llm.langgraph.utils import call_openai
-from miramind.shared.logger import logger  
+from miramind.shared.logger import logger
 
 logger.info("Logger is working inside chatbot.py")
 
@@ -37,6 +38,7 @@ EMOTION_PROMPT = (
     "Do not include any emojis."
 )
 
+
 # --- Initialization Function ---
 def initialize_clients():
     load_dotenv()
@@ -44,14 +46,17 @@ def initialize_clients():
     tts = get_tts_provider("azure")
     return openai_client, tts
 
+
 # --- Global Variables (initialized in main) ---
 client = None
 tts_provider = None
+
 
 # --- Models ---
 class EmotionResult(BaseModel):
     emotion: str
     confidence: float
+
 
 # --- Core Nodes ---
 def detect_emotion(state: Dict[str, Any]) -> Dict[str, Any]:
@@ -60,7 +65,7 @@ def detect_emotion(state: Dict[str, Any]) -> Dict[str, Any]:
 
     messages = [
         {"role": "system", "content": EMOTION_PROMPT},
-        {"role": "user", "content": user_input}
+        {"role": "user", "content": user_input},
     ]
 
     raw = call_openai(messages)
@@ -80,7 +85,7 @@ def detect_emotion(state: Dict[str, Any]) -> Dict[str, Any]:
         **state,
         "emotion": emotion,
         "emotion_confidence": confidence,
-        "chat_history": state.get("chat_history", []) + [{"role": "user", "content": user_input}]
+        "chat_history": state.get("chat_history", []) + [{"role": "user", "content": user_input}],
     }
 
 
@@ -88,7 +93,7 @@ def detect_emotion(state: Dict[str, Any]) -> Dict[str, Any]:
 def get_graph():
     """
     Constructs and returns the main LangGraph for emotion-based chatbot routing.
-    
+
     Returns:
         StateGraph: Compiled LangGraph ready for execution
     """
@@ -117,23 +122,25 @@ def get_graph():
             "anxious": "gentle_flow",
             "embarrassed": "gentle_flow",
             "scared": "gentle_flow",
-            "neutral": "neutral_flow"
-        }
+            "neutral": "neutral_flow",
+        },
     )
 
     return main_graph.compile()
+
 
 def main():
     """
     Main function to initialize clients and set up the chatbot.
     """
     global client, tts_provider
-    
+
     # Initialize clients and environment
     client, tts_provider = initialize_clients()
-    
+
     # Create and return the chatbot
     return get_graph()
+
 
 # --- Final Compiled Graph ---
 chatbot = None  # Will be initialized when main() is called

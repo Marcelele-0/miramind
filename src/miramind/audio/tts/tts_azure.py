@@ -160,4 +160,3 @@ class AzureTTSProvider(TTSProvider):
         '''
 
         return ssml.strip()
-    
