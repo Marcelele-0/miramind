@@ -30,6 +30,7 @@ class ListeningThread(threading.Thread):
         """
         Constructor of ListeningThread class.
 
+
         Args:
             return_queue: queue.Queue instance, where recorded audio (in form of numpy array) is put.
             name: name of the thread (as per threading.Thread).
@@ -92,6 +93,7 @@ class TranscribingBytesThread(threading.Thread):
     ):
         """
         Constructor of TranscribingBytesThread.
+
 
         Args:
             target_queue: queue.Queue instance containing arrays representing sound to transcribe.
@@ -158,6 +160,7 @@ def timed_listen_and_transcribe(
     This function joins main functionality of ListeningThread and TranscribingBytesThread. It will record speech for fixed time and then transcribe it.
     The main idea is to employ two listening threads (shifted by lag) to cover all incoming voice, as there is delay between chunks.
 
+
     Args:
         client: Azure OpenAI client for api calls.
         duration: duration of whole recording.
@@ -167,6 +170,7 @@ def timed_listen_and_transcribe(
         rec_logger: logger instance that will be passed as a logger of listening thread.
         stt_logger: logger instance that will be passed as a logger of transcribing thread.
         timeout: timeout for all queues involved.
+
 
     Returns:
         buffer with transcripts (in form of {"transcript": "transcript od audio"}). If buffer arg was provided then it will also put those in buffer else it will return new queue.Queue instance..

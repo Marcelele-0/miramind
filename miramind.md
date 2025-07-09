@@ -1,7 +1,10 @@
-pip install -e .
-uvicorn miramind.api.main:app --reload
-npm install
-npm run dev
+<a id="main"></a>
+
+# main
+
+<a id="new_file"></a>
+
+# new\_file
 
 <a id="miramind"></a>
 
@@ -25,8 +28,9 @@ def get_loggers()
 
 Get rec_stream_logger and stt_stream_logger.
 
-Returns:
-    (rec_stream_logger, stt_stream_logger)
+**Returns**:
+
+  (rec_stream_logger, stt_stream_logger)
 
 <a id="miramind.audio.stt.stt_class"></a>
 
@@ -42,8 +46,9 @@ class STT()
 
 A class handling transcribing audio files.
 
-Attributes:
-    client: client instance used for API calls.
+**Attributes**:
+
+- `client` - client instance used for API calls.
 
 <a id="miramind.audio.stt.stt_class.STT.__init__"></a>
 
@@ -55,9 +60,10 @@ def __init__(client, logger=None)
 
 Constructor of STT class.
 
-Args:
-    client: client instance for API calls.
-    logger: logger instance for logging.
+**Arguments**:
+
+- `client` - client instance for API calls.
+- `logger` - logger instance for logging.
 
 <a id="miramind.audio.stt.stt_class.STT.transcribe_bytes"></a>
 
@@ -69,11 +75,14 @@ def transcribe_bytes(bytes)
 
 Transcribe bytes object.
 
-Args:
-    bytes: bytes object representing sound to transcribe.
+**Arguments**:
 
-Returns:
-    dict[str: str]: dict containing transcript (with key "transcript")
+- `bytes` - bytes object representing sound to transcribe.
+
+
+**Returns**:
+
+- `dict[str` - str]: dict containing transcript (with key "transcript")
 
 <a id="miramind.audio.stt.stt_class.STT.transcribe"></a>
 
@@ -85,14 +94,17 @@ def transcribe(file_path: str) -> dict[str:str]
 
 Transcribes an audio file and detects the language of the transcript.
 
-Args:
-    file_path (str): Path to the audio file to be transcribed.
+**Arguments**:
 
-Returns:
-    dict[str, str]: A dictionary containing the detected language and the transcribed text.
-                    Keys are:
-                        - 'language': The detected language (e.g., 'english', 'german').
-                        - 'transcript': The transcribed text from the audio.
+- `file_path` _str_ - Path to the audio file to be transcribed.
+
+
+**Returns**:
+
+  dict[str, str]: A dictionary containing the detected language and the transcribed text.
+  Keys are:
+  - 'language': The detected language (e.g., 'english', 'german').
+  - 'transcript': The transcribed text from the audio.
 
 <a id="miramind.audio.stt.stt_class.LinearListeningSTT"></a>
 
@@ -114,9 +126,10 @@ def run(chunk_duration, sample_rate=SAMPLE_RATE)
 
 Main functionality of LinearListeningSTT.
 
-Args:
-    chunk_duration: duration (in seconds) of listening before transcribing recorded sound.
-    sample_rate: recording's sample rate (default 44100).
+**Arguments**:
+
+- `chunk_duration` - duration (in seconds) of listening before transcribing recorded sound.
+- `sample_rate` - recording's sample rate (default 44100).
 
 <a id="miramind.audio.stt.stt_stream"></a>
 
@@ -132,8 +145,9 @@ def get_short_uuid()
 
 Unique id generator.
 
-Returns:
-    id that is unlikely to have been generated before (str).
+**Returns**:
+
+  id that is unlikely to have been generated before (str).
 
 <a id="miramind.audio.stt.stt_stream.RecordingStream"></a>
 
@@ -145,10 +159,11 @@ class RecordingStream()
 
 Class for handling recording speech.
 
-Attributes:
-    _file_queue: Queue instance containing paths to saved files.
-    save_dir: path to directory where recordings are saved.
-    _stop_flag: threading.Event instance used to stop run method.
+**Attributes**:
+
+- `_file_queue` - Queue instance containing paths to saved files.
+- `save_dir` - path to directory where recordings are saved.
+- `_stop_flag` - threading.Event instance used to stop run method.
 
 <a id="miramind.audio.stt.stt_stream.RecordingStream.__init__"></a>
 
@@ -160,9 +175,10 @@ def __init__(save_dir: str = None, logger=None)
 
 Constructor of RecordingStream class.
 
-Args:
-    save_dir: path to directory where recordings are saved. Default depends on .env file.
-    logger: logging instance used for logging.
+**Arguments**:
+
+- `save_dir` - path to directory where recordings are saved. Default depends on .env file.
+- `logger` - logging instance used for logging.
 
 <a id="miramind.audio.stt.stt_stream.RecordingStream.get_file_queue"></a>
 
@@ -195,16 +211,21 @@ def record(path: str = "output.wav", logger: logging.Logger = None, **kwargs)
 
 Static method used for recording audio. After running this method program will record from default system microphone.
 
-Args:
-    path: path where recording will be saved recording.
-    logger: object used for logging purposes.
+**Arguments**:
 
-Keyword Args:
-    duration: duration of recording in seconds.
-    sample_rate: sample rate of recording.
+- `path` - path where recording will be saved recording.
+- `logger` - object used for logging purposes.
 
-Returns:
-    None
+
+**Arguments**:
+
+- `duration` - duration of recording in seconds.
+- `sample_rate` - sample rate of recording.
+
+
+**Returns**:
+
+  None
 
 <a id="miramind.audio.stt.stt_stream.RecordingStream.run"></a>
 
@@ -219,16 +240,19 @@ Result of running this method is twofold:
 - having recordings in a specified directory,
 - having put path of said recordings to file_queue
 
-Keyword Args:
-    duration: duration of recording in seconds.
-    sample_rate: sample rate of recording.
-    prompting_func: function to be called when recording is starting.
-    loop_indicator_func: function to indicate change of chunks.
+**Arguments**:
 
-    Rest of keyword arguments are specific to prompting_function and loop_indicator_func.
+- `duration` - duration of recording in seconds.
+- `sample_rate` - sample rate of recording.
+- `prompting_func` - function to be called when recording is starting.
+- `loop_indicator_func` - function to indicate change of chunks.
 
-Returns:
-    None
+  Rest of keyword arguments are specific to prompting_function and loop_indicator_func.
+
+
+**Returns**:
+
+  None
 
 <a id="miramind.audio.stt.stt_stream.STTStream"></a>
 
@@ -240,11 +264,12 @@ class STTStream()
 
 Class for handling transcriptions of recorded files.
 
-Attributes:
-    target_queue: Queue instance containing paths of recordings to transcribe.
-    stt: STT instance used to transcribe recordings.
-    stop_flag: threading.Event instance used to stop run method.
-    buffer: Queue instance where transcripts are put.
+**Attributes**:
+
+- `target_queue` - Queue instance containing paths of recordings to transcribe.
+- `stt` - STT instance used to transcribe recordings.
+- `stop_flag` - threading.Event instance used to stop run method.
+- `buffer` - Queue instance where transcripts are put.
 
 <a id="miramind.audio.stt.stt_stream.STTStream.__init__"></a>
 
@@ -256,10 +281,11 @@ def __init__(target_queue, client, logger=None)
 
 Constructor of STTStream.
 
-Args:
-    target_queue: Queue instance where paths of files to transcribe are stored.
-    client: client instance used for API calls.
-    logger: logger instance used for logging.
+**Arguments**:
+
+- `target_queue` - Queue instance where paths of files to transcribe are stored.
+- `client` - client instance used for API calls.
+- `logger` - logger instance used for logging.
 
 <a id="miramind.audio.stt.stt_stream.STTStream.get_stop_flag"></a>
 
@@ -291,8 +317,9 @@ def transcribe()
 
 Methods that transcribes first file from _target_queue and puts transcript to _buffer.
 
-Returns:
-    file, transcript: path of transcribed file and transcription
+**Returns**:
+
+  file, transcript: path of transcribed file and transcription
 
 <a id="miramind.audio.stt.stt_stream.STTStream.run"></a>
 
@@ -305,11 +332,14 @@ def run(verbose=True)
 Method used as target function of a Thread. The using this method will result in transcribing files enqueued in target_queue,
 then transcripts are put into _buffer. It will be stopped when _stop_flag is set.
 
-Args:
-    verbose: bool = True: If True then log transcripts.
+**Arguments**:
 
-Returns:
-    None
+- `verbose` - bool = True: If True then log transcripts.
+
+
+**Returns**:
+
+  None
 
 <a id="miramind.audio.stt.stt_stream.RecSTTStream"></a>
 
@@ -321,12 +351,13 @@ class RecSTTStream()
 
 Class used for creating and running recording and transcription in parallel.
 
-Attributes:
-    buffer: Queue instance where transcripts are stored.
-    rec_thread: thread responsible for running recording.
-    stt_thread: thread responsible for creating transcripts.
-    rec_flag: event used to stop rec_thread.
-    stt_flag: event used to stop stt_thread.
+**Attributes**:
+
+- `buffer` - Queue instance where transcripts are stored.
+- `rec_thread` - thread responsible for running recording.
+- `stt_thread` - thread responsible for creating transcripts.
+- `rec_flag` - event used to stop rec_thread.
+- `stt_flag` - event used to stop stt_thread.
 
 <a id="miramind.audio.stt.stt_stream.RecSTTStream.__init__"></a>
 
@@ -343,15 +374,16 @@ def __init__(client,
 
 Constructor of RecSTTStream.
 
-Args:
-    client: client instance used for API calls.
-    duration: duration of a chunk.
-    sample_rate: sample rate of a chunk.
-    verbose: if True, log verbosity increased.
-    rec_stream: RecordingStream instance used for handling recording.
-    stt_stream: STTStream instance used for handling transcribing.
-    stt_logger: logger instance used for logging STT process.
-    rec_logger: logger instance used for logging recording.
+**Arguments**:
+
+- `client` - client instance used for API calls.
+- `duration` - duration of a chunk.
+- `sample_rate` - sample rate of a chunk.
+- `verbose` - if True, log verbosity increased.
+- `rec_stream` - RecordingStream instance used for handling recording.
+- `stt_stream` - STTStream instance used for handling transcribing.
+- `stt_logger` - logger instance used for logging STT process.
+- `rec_logger` - logger instance used for logging recording.
 
 <a id="miramind.audio.stt.stt_stream.RecSTTStream.start"></a>
 
@@ -363,8 +395,9 @@ def start()
 
 Start rec_thread and stt_thread.
 
-Returns:
-    None
+**Returns**:
+
+  None
 
 <a id="miramind.audio.stt.stt_stream.RecSTTStream.stop"></a>
 
@@ -376,8 +409,9 @@ def stop()
 
 Stop rec_thread and stt_thread.
 
-Returns:
-    buffer
+**Returns**:
+
+  buffer
 
 <a id="miramind.audio.stt.stt_threads"></a>
 
@@ -411,15 +445,16 @@ def __init__(return_queue,
 Constructor of ListeningThread class.
 
 
-Args:
-    return_queue: queue.Queue instance, where recorded audio (in form of numpy array) is put.
-    name: name of the thread (as per threading.Thread).
-    daemon: if True, thread will be daemon.
-    flag: threading.Event used to stop this thread (if none is provided one is generated, can be obtained by get_flag method).
-    chunk_duration: duration of a chunk.
-    sample_rate: recording's sample rate (frames per second).
-    logger: logger instance used for logging.
-    prompt: function called on beginning of each chunk (if none is provided iw will be print chunk's nuber).
+**Arguments**:
+
+- `return_queue` - queue.Queue instance, where recorded audio (in form of numpy array) is put.
+- `name` - name of the thread (as per threading.Thread).
+- `daemon` - if True, thread will be daemon.
+- `flag` - threading.Event used to stop this thread (if none is provided one is generated, can be obtained by get_flag method).
+- `chunk_duration` - duration of a chunk.
+- `sample_rate` - recording's sample rate (frames per second).
+- `logger` - logger instance used for logging.
+- `prompt` - function called on beginning of each chunk (if none is provided iw will be print chunk's nuber).
 
 <a id="miramind.audio.stt.stt_threads.TranscribingBytesThread"></a>
 
@@ -450,16 +485,17 @@ def __init__(target_queue,
 Constructor of TranscribingBytesThread.
 
 
-Args:
-    target_queue: queue.Queue instance containing arrays representing sound to transcribe.
-    stt: STT instance used for transcribing.
-    name: name of the thread.
-    flag: threading.Event used to stop this thread (if none is provided one is generated, can be obtained by get_flag method).
-    buffer: queue.Queue instance where transcripts will be put (if none is provided one will be created and can be accessed by get_buffer method)
-    logger: logger instance for logging.
-    daemon: if True this thread will be daemon.
-    sample_rate: sample rate of recording (this should match sample rate of recordings).
-    timeout: timeout for queues involved in this thread.
+**Arguments**:
+
+- `target_queue` - queue.Queue instance containing arrays representing sound to transcribe.
+- `stt` - STT instance used for transcribing.
+- `name` - name of the thread.
+- `flag` - threading.Event used to stop this thread (if none is provided one is generated, can be obtained by get_flag method).
+- `buffer` - queue.Queue instance where transcripts will be put (if none is provided one will be created and can be accessed by get_buffer method)
+- `logger` - logger instance for logging.
+- `daemon` - if True this thread will be daemon.
+- `sample_rate` - sample rate of recording (this should match sample rate of recordings).
+- `timeout` - timeout for queues involved in this thread.
 
 <a id="miramind.audio.stt.stt_threads.timed_listen_and_transcribe"></a>
 
@@ -480,19 +516,22 @@ This function joins main functionality of ListeningThread and TranscribingBytesT
 The main idea is to employ two listening threads (shifted by lag) to cover all incoming voice, as there is delay between chunks.
 
 
-Args:
-    client: Azure OpenAI client for api calls.
-    duration: duration of whole recording.
-    chunk_duration: duration of a recorded chunk.
-    lag: time between starting second listening thread (note optimal is hardware dependent).
-    buffer: queue.Queue instance where transcripts will be put.
-    rec_logger: logger instance that will be passed as a logger of listening thread.
-    stt_logger: logger instance that will be passed as a logger of transcribing thread.
-    timeout: timeout for all queues involved.
+**Arguments**:
+
+- `client` - Azure OpenAI client for api calls.
+- `duration` - duration of whole recording.
+- `chunk_duration` - duration of a recorded chunk.
+- `lag` - time between starting second listening thread (note optimal is hardware dependent).
+- `buffer` - queue.Queue instance where transcripts will be put.
+- `rec_logger` - logger instance that will be passed as a logger of listening thread.
+- `stt_logger` - logger instance that will be passed as a logger of transcribing thread.
+- `timeout` - timeout for all queues involved.
 
 
-Returns:
-    buffer with transcripts (in form of {"transcript": "transcript od audio"}). If buffer arg was provided then it will also put those in buffer else it will return new queue.Queue instance..
+
+**Returns**:
+
+  buffer with transcripts (in form of {"transcript": "transcript od audio"}). If buffer arg was provided then it will also put those in buffer else it will return new queue.Queue instance..
 
 <a id="miramind.audio.stt"></a>
 
@@ -524,10 +563,11 @@ def __init__(subscription_key: str,
 
 Initialize Azure TTS provider.
 
-Args:
-    subscription_key (str, optional): Azure Cognitive Services subscription key
-    endpoint (str, optional): Azure Speech service endpoint URL
-    voice_name (str): Voice to use (default: en-US-JennyNeural - supports 14+ emotion styles as of Feb 2025)
+**Arguments**:
+
+- `subscription_key` _str, optional_ - Azure Cognitive Services subscription key
+- `endpoint` _str, optional_ - Azure Speech service endpoint URL
+- `voice_name` _str_ - Voice to use (default: en-US-JennyNeural - supports 14+ emotion styles as of Feb 2025)
 
 <a id="miramind.audio.tts.tts_azure.AzureTTSProvider.synthesize"></a>
 
@@ -539,14 +579,19 @@ def synthesize(input_json: str) -> bytes
 
 Convert input text and emotion data into synthesized speech audio.
 
-Args:
-    input_json (str): JSON string containing text and optional emotion data
+**Arguments**:
 
-Returns:
-    bytes: Audio data in WAV format
+- `input_json` _str_ - JSON string containing text and optional emotion data
 
-Raises:
-    ValueError: If input_json is malformed or missing required fields
+
+**Returns**:
+
+- `bytes` - Audio data in WAV format
+
+
+**Raises**:
+
+- `ValueError` - If input_json is malformed or missing required fields
 
 <a id="miramind.audio.tts.tts_azure.AzureTTSProvider.set_emotion"></a>
 
@@ -558,15 +603,20 @@ def set_emotion(text: str, emotion: str) -> str
 
 Apply emotion to text and return SSML markup with emotion styling.
 
-Args:
-    text (str): The original text to synthesize
-    emotion (str): The emotion to apply
+**Arguments**:
 
-Returns:
-    str: SSML markup with emotion styling applied
+- `text` _str_ - The original text to synthesize
+- `emotion` _str_ - The emotion to apply
 
-Raises:
-    ValueError: If emotion is not supported
+
+**Returns**:
+
+- `str` - SSML markup with emotion styling applied
+
+
+**Raises**:
+
+- `ValueError` - If emotion is not supported
 
 <a id="miramind.audio.tts.tts_base"></a>
 
@@ -593,16 +643,21 @@ def synthesize(input_json: str) -> bytes
 
 Convert input text and emotion data into synthesized speech audio.
 
-Args:
-    input_json (str): JSON string containing text and optional emotion data.
-                       Expected format: {"text": "speech text", "emotion": "emotion_name"}
+**Arguments**:
 
-Returns:
-    bytes: Audio data in bytes format (typically MP3 or WAV)
+- `input_json` _str_ - JSON string containing text and optional emotion data.
+  Expected format: {"text": "speech text", "emotion": "emotion_name"}
 
-Raises:
-    ValueError: If input_json is malformed or missing required fields
-    NotImplementedError: If the method is not implemented by subclass
+
+**Returns**:
+
+- `bytes` - Audio data in bytes format (typically MP3 or WAV)
+
+
+**Raises**:
+
+- `ValueError` - If input_json is malformed or missing required fields
+- `NotImplementedError` - If the method is not implemented by subclass
 
 <a id="miramind.audio.tts.tts_base.TTSProvider.set_emotion"></a>
 
@@ -619,16 +674,21 @@ This method should handle emotion application in a provider-specific way:
 - For SSML-based providers (Azure): return SSML markup with emotion tags
 - For other providers: return modified text or configuration string
 
-Args:
-    text (str): The original text to synthesize
-    emotion (str): The emotion to apply (e.g., 'happy', 'sad', 'neutral')
+**Arguments**:
 
-Returns:
-    str: Formatted text ready for synthesis (SSML, modified text, etc.)
+- `text` _str_ - The original text to synthesize
+- `emotion` _str_ - The emotion to apply (e.g., 'happy', 'sad', 'neutral')
 
-Raises:
-    ValueError: If emotion is not supported by the provider
-    NotImplementedError: If the method is not implemented by subclass
+
+**Returns**:
+
+- `str` - Formatted text ready for synthesis (SSML, modified text, etc.)
+
+
+**Raises**:
+
+- `ValueError` - If emotion is not supported by the provider
+- `NotImplementedError` - If the method is not implemented by subclass
 
 <a id="miramind.audio.tts.tts_factory"></a>
 
@@ -648,20 +708,27 @@ This factory function encapsulates the logic for instantiating different
 TTS providers, making it easy to add new providers without changing
 client code.
 
-Args:
-    name (str): The name of the TTS provider to create (default: "azure")
-    currently_supported: "azure"
+**Arguments**:
 
-Returns:
-    TTSProvider: An instance of the requested TTS provider
+- `name` _str_ - The name of the TTS provider to create (default: "azure")
+- `currently_supported` - "azure"
 
-Raises:
-    ValueError: If the specified provider name is not supported
 
-Example:
-    >>> json_input = '{"text": "Hello world", "emotion": "happy"}'
-    >>> provider = get_tts_provider("azure")
-    >>> audio = provider.synthesize(json_input)
+**Returns**:
+
+- `TTSProvider` - An instance of the requested TTS provider
+
+
+**Raises**:
+
+- `ValueError` - If the specified provider name is not supported
+
+
+**Example**:
+
+  >>> json_input = '{"text": "Hello world", "emotion": "happy"}'
+  >>> provider = get_tts_provider("azure")
+  >>> audio = provider.synthesize(json_input)
 
 <a id="miramind.audio.tts"></a>
 
@@ -691,13 +758,16 @@ def process_chat_message(user_input_text: str,
 
 Processes a single chat message using the chatbot and saves the response audio.
 
-Args:
-    user_input_text: The text message from the user.
-    chat_history: A list of previous chat turns (optional, for continuity).
-    memory: A string summarizing persistent user context.
+**Arguments**:
 
-Returns:
-    A dictionary containing 'response_text', 'audio_file_path', and updated memory.
+- `user_input_text` - The text message from the user.
+- `chat_history` - A list of previous chat turns (optional, for continuity).
+- `memory` - A string summarizing persistent user context.
+
+
+**Returns**:
+
+  A dictionary containing 'response_text', 'audio_file_path', and updated memory.
 
 <a id="miramind.llm.langgraph.subgraphs"></a>
 
@@ -725,11 +795,14 @@ def get_blob_service_client(logger=None)
 
 Easy way to get blob service client for API calls.
 
-Args:
-    logger instance for logging.
+**Arguments**:
 
-Returns:
-    blob service client instance
+  logger instance for logging.
+
+
+**Returns**:
+
+  blob service client instance
 
 <a id="miramind.shared.azure_utils.upload_file"></a>
 
@@ -745,12 +818,13 @@ def upload_file(local_file,
 
 Upload file to storage acount.
 
-Args:
-    local_file: path of file to upload.
-    target_blob: name of blob, that will represent local_file.
-    container: container where target blob wil be stored.
-    blob_service_client: client instance (connected with appropriate storage account). Must have specified container.
-    logger: logger instance for logging.
+**Arguments**:
+
+- `local_file` - path of file to upload.
+- `target_blob` - name of blob, that will represent local_file.
+- `container` - container where target blob wil be stored.
+- `blob_service_client` - client instance (connected with appropriate storage account). Must have specified container.
+- `logger` - logger instance for logging.
 
 <a id="miramind.shared.azure_utils.read_blob"></a>
 
@@ -762,14 +836,17 @@ def read_blob(target_blob, container, blob_service_client=None, logger=None)
 
 Get content of a blob stored in Azure.
 
-Args:
-    target_blob: name of blob that will be read.
-    container: name of the container with target blob.
-    blob_service_client: client used for API calls (default is to get a new client).
-    logger: logger instance for logging.
+**Arguments**:
 
-Returns:
-    target blob in bytes form.
+- `target_blob` - name of blob that will be read.
+- `container` - name of the container with target blob.
+- `blob_service_client` - client used for API calls (default is to get a new client).
+- `logger` - logger instance for logging.
+
+
+**Returns**:
+
+  target blob in bytes form.
 
 <a id="miramind.shared.azure_utils.download_blob"></a>
 
@@ -785,12 +862,13 @@ def download_blob(target_blob,
 
 Save result of read_blob to file.
 
-Args:
-    target_blob: name of blob that will be read.
-    container: name of the container with target blob.
-    download_path: path of saved file.
-    blob_service_client: client used for API calls (default is to get a new client).
-    logger: logger instance for logging.
+**Arguments**:
+
+- `target_blob` - name of blob that will be read.
+- `container` - name of the container with target blob.
+- `download_path` - path of saved file.
+- `blob_service_client` - client used for API calls (default is to get a new client).
+- `logger` - logger instance for logging.
 
 <a id="miramind.shared.logger"></a>
 
