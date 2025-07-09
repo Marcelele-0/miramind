@@ -8,26 +8,40 @@ import json
 import os
 
 from miramind.shared.logger import logger
+from miramind.api.const import (
+    FRONTEND_PUBLIC_PATH,
+    NEXTJS_STATIC_PATH,
+    SCRIPT_PATH,
+    CORS_ORIGINS,
+    CORS_ALLOW_CREDENTIALS,
+    CORS_ALLOW_METHODS,
+    CORS_ALLOW_HEADERS,
+    SCRIPT_EXECUTION_TIMEOUT
+)
 
 app = FastAPI()
 
 # Mount static files for audio
-FRONTEND_PUBLIC_PATH = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), "..", "frontend", "public")
-)
 if os.path.exists(FRONTEND_PUBLIC_PATH):
     app.mount("/static", StaticFiles(directory=FRONTEND_PUBLIC_PATH), name="static")
     logger.info(f"Mounted static files from: {FRONTEND_PUBLIC_PATH}")
 else:
     logger.warning(f"Frontend public directory not found: {FRONTEND_PUBLIC_PATH}")
 
+# Mount Next.js static files
+if os.path.exists(NEXTJS_STATIC_PATH):
+    app.mount("/_next/static", StaticFiles(directory=NEXTJS_STATIC_PATH), name="nextjs_static")
+    logger.info(f"Mounted Next.js static files from: {NEXTJS_STATIC_PATH}")
+else:
+    logger.warning(f"Next.js static directory not found: {NEXTJS_STATIC_PATH}")
+
 # Allow frontend requests (adjust origin in production)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_origins=CORS_ORIGINS,
+    allow_credentials=CORS_ALLOW_CREDENTIALS,
+    allow_methods=CORS_ALLOW_METHODS,
+    allow_headers=CORS_ALLOW_HEADERS,
 )
 
 # Input model for chat
@@ -35,10 +49,6 @@ class ChatInput(BaseModel):
     userInput: str
     chatHistory: list = []
     memory: str = ""
-
-SCRIPT_PATH = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), "..", "llm", "langgraph", "run_chat.py")
-)
 
 @app.post("/api/chat/start")
 async def start_call():
@@ -95,7 +105,7 @@ async def chat_message(input: ChatInput):
             capture_output=True,
             text=True,
             cwd=os.path.dirname(os.path.dirname(os.path.dirname(__file__))),  # Set working directory to miramind root
-            timeout=60  # Add timeout to prevent hanging
+            timeout=SCRIPT_EXECUTION_TIMEOUT  # Add timeout to prevent hanging
         )
 
         logger.debug(f"Subprocess completed with return code: {result.returncode}")

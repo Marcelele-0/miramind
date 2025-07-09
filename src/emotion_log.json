@@ -10,5 +10,17 @@
     "emotion": "scared",
     "confidence": 0.85,
     "response": "It sounds like you're feeling overwhelmed or upset about something. It's okay to feel that way, and I'm here to listen if you want to share what's on your mind. Can you tell me more about what's happening that makes you feel like running away?"
+  },
+  {
+    "input": "Hi im Adam",
+    "emotion": "neutral",
+    "confidence": 0.9,
+    "response": "Hi, Adam! It\u2019s really nice to meet you. What\u2019s on your mind today?"
+  },
+  {
+    "input": "Hi im Adam",
+    "emotion": "neutral",
+    "confidence": 0.8,
+    "response": "Hi, Adam! It\u2019s really nice to meet you. How are you feeling today?"
   }
 ]

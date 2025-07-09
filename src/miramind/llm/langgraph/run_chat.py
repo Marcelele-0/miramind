@@ -61,7 +61,6 @@ def process_chat_message(user_input_text: str, chat_history: list = [], memory: 
         }
 
 def main():
-    # This block allows run_chat.py to be called from the command line with JSON input
     if len(sys.argv) > 1:
         try:
             input_data = json.loads(sys.argv[1])

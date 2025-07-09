@@ -10,7 +10,7 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 src_dir = os.path.join(current_dir, "src")
 sys.path.insert(0, src_dir)
 
-if __name__ == "__main__":
+def main():
     # Run the FastAPI server
     uvicorn.run(
         "miramind.api.main:app",
@@ -19,3 +19,6 @@ if __name__ == "__main__":
         reload=True,
         log_level="info"
     )
+
+if __name__ == "__main__":
+    main()
