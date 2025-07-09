@@ -38,7 +38,8 @@ dependencies = [
     "pytest-cov",
     "pytest-env",
     "pytest-mock",
-    "azure-storage-blob"
+    "azure-storage-blob",
+    "pydoc-markdown"
 ]
 
 [tool.setuptools.packages.find]
