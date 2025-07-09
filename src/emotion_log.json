@@ -22,5 +22,29 @@
     "emotion": "neutral",
     "confidence": 0.8,
     "response": "Hi, Adam! It\u2019s really nice to meet you. How are you feeling today?"
+  },
+  {
+    "input": "I want to hide",
+    "emotion": "scared",
+    "confidence": 0.85,
+    "response": "It sounds like something might feel really big or overwhelming for you right now. Wanting to hide can be a way of saying you need a break or some space to feel safe. Do you want to tell me a little more about what\u2019s making you feel this way? Or would you rather talk about where you feel like hiding? I\u2019m here to listen however you need."
+  },
+  {
+    "input": "I will go to cinema tomorrow",
+    "emotion": "neutral",
+    "confidence": 0.75,
+    "response": "That sounds exciting! Do you already know what movie you're going to watch? Or are you just going to decide when you get there?"
+  },
+  {
+    "input": "whats up?",
+    "emotion": "neutral",
+    "confidence": 0.0,
+    "response": "Not much\u2014just here to chat with you! What's on your mind today?"
+  },
+  {
+    "input": "Is it working?",
+    "emotion": "neutral",
+    "confidence": 0.0,
+    "response": "I think I might need a little more information to understand what you\u2019re asking. Are you trying something new? Testing how something feels? Or perhaps checking if I\u2019m listening? Let me know how I can support you."
   }
 ]

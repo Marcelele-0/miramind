@@ -17,10 +17,6 @@ load_dotenv()
 DEFAULT_MODEL = "gpt-4o"
 LOG_FILE = "emotion_log.json"
 
-# --- Client Init ---
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-tts_provider = get_tts_provider("azure")
-
 # --- Logger ---
 class EmotionLogger:
     def __init__(self, filepath: str):
@@ -46,10 +42,8 @@ class EmotionLogger:
         except Exception as e:
             print(f"Logging failed: {e}")
 
-EmotionLogger = EmotionLogger(LOG_FILE)
-
 # --- API Helper ---
-def call_openai(messages: List[Dict[str, str]], model: str = DEFAULT_MODEL) -> str:
+def call_openai(client: OpenAI, messages: List[Dict[str, str]], model: str = DEFAULT_MODEL) -> str:
     try:
         response = client.chat.completions.create(model=model, messages=messages)
         return response.choices[0].message.content.strip()
@@ -58,7 +52,7 @@ def call_openai(messages: List[Dict[str, str]], model: str = DEFAULT_MODEL) -> s
         return ""
 
 # --- Response Generator ---
-def generate_response(style: str):
+def generate_response(style: str, client: OpenAI, tts_provider, emotion_logger: EmotionLogger):
     def responder(state: Dict[str, Any]) -> Dict[str, Any]:
         user_input = state["user_input"]
         chat_history = state.get("chat_history", [])
@@ -70,7 +64,7 @@ def generate_response(style: str):
         )
 
         messages = [{"role": "system", "content": system_content}] + chat_history + [{"role": "user", "content": user_input}]
-        reply = call_openai(messages)
+        reply = call_openai(client, messages)
 
         try:
             audio_bytes = tts_provider.synthesize(json.dumps({
@@ -81,7 +75,7 @@ def generate_response(style: str):
             print(f"TTS synthesis error: {e}")
             audio_bytes = None
 
-        EmotionLogger.log(
+        emotion_logger.log(
             input_text=user_input,
             emotion=state.get("emotion", "neutral"),
             confidence=state.get("emotion_confidence", 0.0),
@@ -104,3 +98,15 @@ def generate_response(style: str):
             ]
         }
     return responder
+
+def main():
+    """Initialize client, TTS provider, and emotion logger."""
+    # --- Client Init ---
+    client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+    tts_provider = get_tts_provider("azure")
+    emotion_logger = EmotionLogger(LOG_FILE)
+    
+    return client, tts_provider, emotion_logger
+
+if __name__ == "__main__":
+    client, tts_provider, emotion_logger = main()

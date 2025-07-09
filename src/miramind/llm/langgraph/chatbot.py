@@ -44,8 +44,9 @@ def initialize_clients():
     tts = get_tts_provider("azure")
     return openai_client, tts
 
-# --- Initialize Clients ---
-client, tts_provider = initialize_clients()
+# --- Global Variables (initialized in main) ---
+client = None
+tts_provider = None
 
 # --- Models ---
 class EmotionResult(BaseModel):
@@ -83,35 +84,59 @@ def detect_emotion(state: Dict[str, Any]) -> Dict[str, Any]:
     }
 
 
-# --- Main LangGraph ---
-main_graph = StateGraph(dict)
+# --- Graph Construction Function ---
+def get_graph():
+    """
+    Constructs and returns the main LangGraph for emotion-based chatbot routing.
+    
+    Returns:
+        StateGraph: Compiled LangGraph ready for execution
+    """
+    main_graph = StateGraph(dict)
 
-# Add emotion detection
-main_graph.add_node("detect_emotion", RunnableLambda(detect_emotion))
+    # Add emotion detection
+    main_graph.add_node("detect_emotion", RunnableLambda(detect_emotion))
 
-# Add subgraphs for each emotional path
-main_graph.add_node("sad_flow", build_sad_flow().compile())
-main_graph.add_node("angry_flow", build_angry_flow().compile())
-main_graph.add_node("excited_flow", build_excited_flow().compile())
-main_graph.add_node("gentle_flow", build_gentle_flow().compile())
-main_graph.add_node("neutral_flow", build_neutral_flow().compile())
+    # Add subgraphs for each emotional path
+    main_graph.add_node("sad_flow", build_sad_flow().compile())
+    main_graph.add_node("angry_flow", build_angry_flow().compile())
+    main_graph.add_node("excited_flow", build_excited_flow().compile())
+    main_graph.add_node("gentle_flow", build_gentle_flow().compile())
+    main_graph.add_node("neutral_flow", build_neutral_flow().compile())
 
-# Set entry and conditional routing
-main_graph.set_entry_point("detect_emotion")
-main_graph.add_conditional_edges(
-    "detect_emotion",
-    lambda state: state.get("emotion", "neutral"),
-    {
-        "sad": "sad_flow",
-        "angry": "angry_flow",
-        "happy": "excited_flow",
-        "excited": "excited_flow",
-        "anxious": "gentle_flow",
-        "embarrassed": "gentle_flow",
-        "scared": "gentle_flow",
-        "neutral": "neutral_flow"
-    }
-)
+    # Set entry and conditional routing
+    main_graph.set_entry_point("detect_emotion")
+    main_graph.add_conditional_edges(
+        "detect_emotion",
+        lambda state: state.get("emotion", "neutral"),
+        {
+            "sad": "sad_flow",
+            "angry": "angry_flow",
+            "happy": "excited_flow",
+            "excited": "excited_flow",
+            "anxious": "gentle_flow",
+            "embarrassed": "gentle_flow",
+            "scared": "gentle_flow",
+            "neutral": "neutral_flow"
+        }
+    )
+
+    return main_graph.compile()
+
+def main():
+    """
+    Main function to initialize clients and set up the chatbot.
+    """
+    global client, tts_provider
+    
+    # Initialize clients and environment
+    client, tts_provider = initialize_clients()
+    
+    # Create and return the chatbot
+    return get_graph()
 
 # --- Final Compiled Graph ---
-chatbot = main_graph.compile()
+chatbot = None  # Will be initialized when main() is called
+
+if __name__ == "__main__":
+    chatbot = main()
