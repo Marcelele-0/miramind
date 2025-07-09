@@ -112,6 +112,9 @@ cache/
 emotion_trends/
 user_insights/
 
+# === Temp dirs ===
+temp/sttr_temp
+
 # === Coverage reports ===
 .coverage
 htmlcov/
