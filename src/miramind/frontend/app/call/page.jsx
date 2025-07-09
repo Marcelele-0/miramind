@@ -13,6 +13,7 @@ export default function CallPage() {
   const [hasStarted, setHasStarted] = useState(false);
   const [chatHistory, setChatHistory] = useState([]);
   const [volume, setVolume] = useState(0);
+  const [sessionId, setSessionId] = useState(null);  // Track current session
 
   const audioRef = useRef(null);
   const analyserRef = useRef(null);
@@ -75,6 +76,7 @@ export default function CallPage() {
           body: JSON.stringify({
             userInput,
             chatHistory,
+            sessionId,  // Include session ID
           }),
         }
       );
@@ -221,6 +223,7 @@ export default function CallPage() {
 
       const data = await res.json();
       console.log("Chat start:", data);
+      setSessionId(data.sessionId);  // Store session ID
       setHasStarted(true);
     } catch (err) {
       console.error("Error starting chat:", err);

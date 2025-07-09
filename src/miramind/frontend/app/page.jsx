@@ -86,6 +86,7 @@ export default function Dashboard() {
               variant="ghost"
               size="icon"
               className="absolute bottom-2 right-2"
+              onClick={() => router.push("/transcripts")}
             >
               <ArrowRight />
             </Button>
