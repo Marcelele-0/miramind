@@ -1,7 +1,7 @@
-loader:
-  type: python
-  search_path: ["./src"]
-  modules: ["miramind"]
+loaders:
+  - type: python
+    search_path: ["./src/miramind"]
+    discover: True
 
 renderer:
   type: markdown
