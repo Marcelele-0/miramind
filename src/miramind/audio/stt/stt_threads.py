@@ -2,7 +2,7 @@ import io
 import logging
 import threading
 import time
-from queue import Queue
+from queue import Empty, Queue
 
 import sounddevice as sd
 import soundfile as sf
@@ -88,6 +88,7 @@ class TranscribingBytesThread(threading.Thread):
         logger=None,
         daemon=False,
         sample_rate=SAMPLE_RATE,
+        timeout=6,
     ):
         """
         Constructor of TranscribingBytesThread.
@@ -100,7 +101,8 @@ class TranscribingBytesThread(threading.Thread):
             buffer: queue.Queue instance where transcripts will be put (if none is provided one will be created and can be accessed by get_buffer method)
             logger: logger instance for logging.
             daemon: if True this thread will be daemon.
-            sample_rate: sample rate of recording (this should match sample rate of recordings)
+            sample_rate: sample rate of recording (this should match sample rate of recordings).
+            timeout: timeout for queues involved in this thread.
         """
         super().__init__(
             name=name if name is not None else "Transcribing Bytes Thread", daemon=daemon
@@ -111,6 +113,7 @@ class TranscribingBytesThread(threading.Thread):
         self.buffer = buffer if buffer is not None else Queue()
         self.sample_rate = sample_rate
         self.stt = stt
+        self.timeout = timeout
 
     def get_buffer(self):
         return self.buffer
@@ -127,10 +130,7 @@ class TranscribingBytesThread(threading.Thread):
             index += 1
             try:
                 t = time.time()
-                """
-                If process hangs, it may be caused by the following line.
-                """
-                audio_array = self.target_queue.get()
+                audio_array = self.target_queue.get(timeout=self.timeout)
                 bytes_buffer = io.BytesIO()
                 bytes_buffer.name = f"chunk_nr_{index}.wav"
                 sf.write(bytes_buffer, audio_array, samplerate=self.sample_rate, format="WAV")
@@ -145,7 +145,14 @@ class TranscribingBytesThread(threading.Thread):
 
 
 def timed_listen_and_transcribe(
-    client, duration=10, chunk_duration=5, lag=2, buffer=None, rec_logger=None, stt_logger=None
+    client,
+    duration=10,
+    chunk_duration=5,
+    lag=2,
+    buffer=None,
+    rec_logger=None,
+    stt_logger=None,
+    timeout=10,
 ):
     """
     This function joins main functionality of ListeningThread and TranscribingBytesThread. It will record speech for fixed time and then transcribe it.
@@ -159,6 +166,7 @@ def timed_listen_and_transcribe(
         buffer: queue.Queue instance where transcripts will be put.
         rec_logger: logger instance that will be passed as a logger of listening thread.
         stt_logger: logger instance that will be passed as a logger of transcribing thread.
+        timeout: timeout for all queues involved.
 
     Returns:
         buffer with transcripts (in form of {"transcript": "transcript od audio"}). If buffer arg was provided then it will also put those in buffer else it will return new queue.Queue instance..
@@ -183,6 +191,7 @@ def timed_listen_and_transcribe(
         name="transcribing thread",
         buffer=my_buffer,
         logger=stt_logger,
+        timeout=timeout,
     )
     listening_thread1.start()
     transcribing_thread.start()
@@ -196,41 +205,3 @@ def timed_listen_and_transcribe(
     transcribing_thread.get_flag().set()
     transcribing_thread.join()
     return my_buffer
-
-
-def test2():
-    from miramind.audio.stt.loggers import get_loggers
-    from miramind.shared.utils import get_azure_openai_client
-
-    rec_logger, _ = get_loggers()
-    queue = Queue()
-    buffer = Queue()
-    lt = ListeningThread(return_queue=queue, daemon=False, logger=rec_logger)
-    sttt = TranscribingBytesThread(
-        target_queue=queue, stt=STT(client=get_azure_openai_client()), buffer=buffer, logger=_
-    )
-    lt.start()
-    sttt.start()
-    time.sleep(10)
-    lt.get_flag().set()
-    lt.join()
-    sttt.get_flag().set()
-    sttt.join()
-    while not buffer.empty():
-        print(buffer.get())
-
-
-def test3():
-    from miramind.audio.stt.loggers import get_loggers
-    from miramind.shared.utils import get_azure_openai_client
-
-    rec_l, stt_l = get_loggers()
-    buffer = timed_listen_and_transcribe(
-        client=get_azure_openai_client(), rec_logger=rec_l, stt_logger=stt_l
-    )
-    while not buffer.empty():
-        print(buffer.get())
-
-
-if __name__ == "__main__":
-    test3()
