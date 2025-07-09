@@ -1,3 +1,8 @@
+pip install -e .
+uvicorn miramind.api.main:app --reload
+npm install
+npm run dev
+
 <a id="miramind"></a>
 
 # miramind
