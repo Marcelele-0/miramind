@@ -31,20 +31,19 @@ class AzureTTSProvider(TTSProvider):
 
         # Define emotion styles mapping
         self.emotion_styles = {
+            'angry': 'calm',
             'assistant': 'assistant',
             'cheerful': 'cheerful',
-            'calm': 'calm',
-            'conversational': 'conversational',
-            'angry': 'calm',
             'chat': 'chat',
             'excited': 'excited',
             'friendly': 'friendly',
             'hopeful': 'hopeful',
             'newscast': 'newscast',
-            'sad': 'sad',
+            'sad': 'hopeful',
+            'scared': 'calm',
+            'terrified': 'calm',
+            'unfriendly': 'friendly',
             'whispering': 'whispering',
-            'scared': 'general',
-            'anxious': 'general',
             'neutral': 'general',  # general is the default style
             'happy': 'cheerful',  # mapping for common emotion name
         }
@@ -125,6 +124,7 @@ class AzureTTSProvider(TTSProvider):
         Raises:
             ValueError: If emotion is not supported
         """
+        logger.info(f"Setting emotion '{emotion}'")
         # Validate emotion
         if emotion not in self.emotion_styles:
             available_emotions = ", ".join(self.emotion_styles.keys())
@@ -144,6 +144,7 @@ class AzureTTSProvider(TTSProvider):
         Returns:
             str: SSML markup string
         """
+        logger.info(f"Creating SSML for emotion '{emotion}'")
         style = self.emotion_styles.get(emotion, 'general')
 
         # Support for correct SSML structure
@@ -159,4 +160,3 @@ class AzureTTSProvider(TTSProvider):
         '''
 
         return ssml.strip()
-    
