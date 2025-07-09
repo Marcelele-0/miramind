@@ -1,0 +1,7 @@
+loader:
+  type: python
+  search_path: ["./src"]
+  modules: ["miramind"]
+
+renderer:
+  type: markdown
