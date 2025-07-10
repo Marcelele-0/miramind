@@ -205,5 +205,31 @@
         "botResponse": "Hi there! I'm here and ready to chat with you. How are you feeling today?"
       }
     ]
+  },
+  {
+    "sessionId": "7e35f2b2-e75f-4ea1-ad76-9a9a9e445c5d",
+    "startTime": "2025-07-10T17:10:55.793730",
+    "messages": [
+      {
+        "timestamp": "2025-07-10T17:11:11.235017",
+        "userInput": "Hi how are you?",
+        "emotion": "neutral",
+        "confidence": 0.0,
+        "botResponse": "Hello! I'm here and ready to chat with you. How are you feeling today?"
+      }
+    ]
+  },
+  {
+    "sessionId": "7c7d41c0-25b7-4ac5-9918-e7ed1090ef89",
+    "startTime": "2025-07-10T17:12:09.246668",
+    "messages": [
+      {
+        "timestamp": "2025-07-10T17:12:23.935797",
+        "userInput": "Hi im Adam ",
+        "emotion": "neutral",
+        "confidence": 0.0,
+        "botResponse": "Hi Adam! It's great to meet you. How are you feeling today?"
+      }
+    ]
   }
 ]

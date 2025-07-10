@@ -184,5 +184,17 @@
     "emotion": "neutral",
     "confidence": 0.0,
     "response": "Hi there! I'm here and ready to chat with you. How are you feeling today?"
+  },
+  {
+    "input": "Hi how are you?",
+    "emotion": "neutral",
+    "confidence": 0.0,
+    "response": "Hello! I'm here and ready to chat with you. How are you feeling today?"
+  },
+  {
+    "input": "Hi im Adam ",
+    "emotion": "neutral",
+    "confidence": 0.0,
+    "response": "Hi Adam! It's great to meet you. How are you feeling today?"
   }
 ]
