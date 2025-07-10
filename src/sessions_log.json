@@ -818,5 +818,45 @@
         "botResponse": "That’s okay! Sometimes it’s hard to find the right words. What’s something that’s been on your mind lately? Would you like to tell me more about what's making you feel this way?"
       }
     ]
+  },
+  {
+    "sessionId": "a966b40c-6362-42d1-81d1-a3dea3378097",
+    "startTime": "2025-07-10T21:34:22.350546",
+    "messages": [
+      {
+        "timestamp": "2025-07-10T21:34:39.400554",
+        "userInput": "🎤 I just want to check if everything is good before I will go to sleep",
+        "emotion": "neutral",
+        "confidence": 0.0,
+        "botResponse": "It’s great that you want to check in! What’s on your mind? Are there specific thoughts or feelings you’d like to talk about before bed?"
+      },
+      {
+        "timestamp": "2025-07-10T21:35:01.672406",
+        "userInput": "🎤 No, nothing special, I'm just... just checking.",
+        "emotion": "neutral",
+        "confidence": 0.0,
+        "botResponse": "That's totally fine! Sometimes just checking in can be helpful. Is there anything you enjoy doing before bed that helps you relax?"
+      }
+    ]
+  },
+  {
+    "sessionId": "c564c901-3c31-450d-91fa-6b38823e3ded",
+    "startTime": "2025-07-10T21:35:10.546926",
+    "messages": [
+      {
+        "timestamp": "2025-07-10T21:35:42.013892",
+        "userInput": "🎤 Hi there, how are you?",
+        "emotion": "neutral",
+        "confidence": 0.0,
+        "botResponse": "I'm here and ready to chat! What’s on your mind today?"
+      },
+      {
+        "timestamp": "2025-07-10T21:35:55.254840",
+        "userInput": "🎤 I'm fine. Nothing special happened.",
+        "emotion": "neutral",
+        "confidence": 0.0,
+        "botResponse": "That’s okay! Sometimes having a quiet day can be nice. Is there anything you like to do on days like this?"
+      }
+    ]
   }
 ]
