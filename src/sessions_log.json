@@ -545,5 +545,278 @@
         "botResponse": "Okay, glad to hear it! Is there anything specific you'd like to talk about or share?"
       }
     ]
+  },
+  {
+    "sessionId": "5fb503a5-14d7-42f6-8b34-b947db156e22",
+    "startTime": "2025-07-10T18:59:48.732178",
+    "messages": [
+      {
+        "timestamp": "2025-07-10T19:00:02.927662",
+        "userInput": "Hi there, is everything ok?",
+        "emotion": "neutral",
+        "confidence": 0.0,
+        "botResponse": "Hi! I'm here and ready to chat. How are you feeling today?"
+      },
+      {
+        "timestamp": "2025-07-10T19:00:20.797842",
+        "userInput": "I'm fine, I'm just checking out.",
+        "emotion": "neutral",
+        "confidence": 0.0,
+        "botResponse": "That's okay! If you ever feel like talking about anything, whether it's fun stuff or something on your mind, I'm here for you. What's something fun you did recently?"
+      }
+    ]
+  },
+  {
+    "sessionId": "1a877362-25c0-4de2-b3c3-2ff2fc975239",
+    "startTime": "2025-07-10T19:57:48.746447",
+    "messages": [
+      {
+        "timestamp": "2025-07-10T19:58:02.697678",
+        "userInput": "Hi there!",
+        "emotion": "neutral",
+        "confidence": 0.0,
+        "botResponse": "Hello! How are you feeling today?"
+      },
+      {
+        "timestamp": "2025-07-10T19:58:18.668867",
+        "userInput": "I'm fine",
+        "emotion": "neutral",
+        "confidence": 0.0,
+        "botResponse": "Got it. Anything on your mind you'd like to chat about?"
+      }
+    ]
+  },
+  {
+    "sessionId": "8ebc1fe1-90f7-443f-8053-c05df8082d68",
+    "startTime": "2025-07-10T20:02:23.706796",
+    "messages": [
+      {
+        "timestamp": "2025-07-10T20:02:43.628408",
+        "userInput": "I wish that everything is still working.",
+        "emotion": "neutral",
+        "confidence": 0.0,
+        "botResponse": "It sounds like you're feeling worried about things not going as they should. Do you want to talk about what's on your mind or anything specific you're concerned about?"
+      },
+      {
+        "timestamp": "2025-07-10T20:03:05.280530",
+        "userInput": "Nah, I'm just joking.",
+        "emotion": "neutral",
+        "confidence": 0.0,
+        "botResponse": "Got it! Jokes can be a fun way to express ourselves. Is there anything else on your mind or something you'd like to share or talk about?"
+      }
+    ]
+  },
+  {
+    "sessionId": "64203e8a-75bf-43bb-ab6d-c5e64bd13a34",
+    "startTime": "2025-07-10T20:03:18.852410",
+    "messages": [
+      {
+        "timestamp": "2025-07-10T20:03:38.356442",
+        "userInput": "Bye.",
+        "emotion": "neutral",
+        "confidence": 0.0,
+        "botResponse": "Hey there! It seems like you might be ready to go. If you ever want to chat, I'm here for you. Take care!"
+      }
+    ]
+  },
+  {
+    "sessionId": "d4350135-c33b-41cf-bfe9-671d53f63a58",
+    "startTime": "2025-07-10T20:05:28.942360",
+    "messages": [
+      {
+        "timestamp": "2025-07-10T20:05:44.018696",
+        "userInput": "Is the animation changed?",
+        "emotion": "neutral",
+        "confidence": 0.0,
+        "botResponse": "Are you noticing something different about an animation you like? Sometimes shows or games update their style, and it can feel a bit strange at first. What do you think about the changes?"
+      },
+      {
+        "timestamp": "2025-07-10T20:06:15.305983",
+        "userInput": "I just want to know if everything is working okay.",
+        "emotion": "anxious",
+        "confidence": 0.85,
+        "botResponse": "It sounds like you're checking to see if things are as they should be. Is there something specific you're concerned about, or is it just a general feeling?"
+      }
+    ]
+  },
+  {
+    "sessionId": "46b78979-a3e4-4f0a-9577-f09a4a072a72",
+    "startTime": "2025-07-10T20:07:40.676628",
+    "messages": [
+      {
+        "timestamp": "2025-07-10T20:08:00.479093",
+        "userInput": "one more check",
+        "emotion": "neutral",
+        "confidence": 0.0,
+        "botResponse": "It sounds like you might be feeling a bit repetitive or stuck. What's on your mind right now that you'd like to talk about?"
+      },
+      {
+        "timestamp": "2025-07-10T20:08:20.846479",
+        "userInput": "Nothing special.",
+        "emotion": "neutral",
+        "confidence": 0.0,
+        "botResponse": "That's okay! Sometimes it's nice to just chat about everyday things. Is there anything fun or interesting you've done recently?"
+      }
+    ]
+  },
+  {
+    "sessionId": "ee821d11-a6ea-41a6-ac54-9ae7908e7129",
+    "startTime": "2025-07-10T20:13:04.658175",
+    "messages": []
+  },
+  {
+    "sessionId": "4344bfee-e096-44c0-9d21-3468a7e33c89",
+    "startTime": "2025-07-10T20:20:16.273750",
+    "messages": []
+  },
+  {
+    "sessionId": "eb9fd6b0-4527-4d7d-b727-9621a062e886",
+    "startTime": "2025-07-10T20:23:40.926957",
+    "messages": [
+      {
+        "timestamp": "2025-07-10T20:26:45.913750",
+        "userInput": "Hi there, my name is Adam. Is it even working properly? I'm not sure if it's working properly. I'm not sure if it's working properly. I'm not sure if it's working properly. I'm not sure if it's working properly.",
+        "emotion": "anxious",
+        "confidence": 0.85,
+        "botResponse": "Hi Adam! It sounds like you're feeling a bit unsure about something. Can you tell me what's on your mind? Maybe we can figure it out together."
+      }
+    ]
+  },
+  {
+    "sessionId": "debb42d6-1718-4529-bde8-59da5767bbe3",
+    "startTime": "2025-07-10T20:28:15.068081",
+    "messages": []
+  },
+  {
+    "sessionId": "e78dc3f1-2535-48a1-a161-5ae3bb25db1e",
+    "startTime": "2025-07-10T20:28:51.619039",
+    "messages": [
+      {
+        "timestamp": "2025-07-10T20:29:07.257820",
+        "userInput": "Hi there, my name's Adam.",
+        "emotion": "neutral",
+        "confidence": 0.0,
+        "botResponse": "Hi Adam! It's nice to meet you. How are you feeling today?"
+      },
+      {
+        "timestamp": "2025-07-10T20:29:24.026802",
+        "userInput": "Ciężko.",
+        "emotion": "sad",
+        "confidence": 0.85,
+        "botResponse": "Rozumiem, że może być trudno. Chcesz mi opowiedzieć, co się dzieje? Would you like to tell me more about what's making you feel this way?"
+      },
+      {
+        "timestamp": "2025-07-10T20:29:51.215482",
+        "userInput": "I said I'm tired",
+        "emotion": "neutral",
+        "confidence": 0.0,
+        "botResponse": "Thanks for letting me know. Being tired can make everything feel a bit harder. Do you know what's been making you feel tired lately?"
+      },
+      {
+        "timestamp": "2025-07-10T20:30:13.441510",
+        "userInput": "Ippu.",
+        "emotion": "neutral",
+        "confidence": 0.0,
+        "botResponse": "Got it. It sounds like you might be saying \"I don't know\" or something similar. It's okay not to have all the answers right now. Is there anything you usually do that helps when you feel this way?"
+      }
+    ]
+  },
+  {
+    "sessionId": "f1d98e1f-9a31-450c-92e4-056d26f5c032",
+    "startTime": "2025-07-10T20:34:47.190876",
+    "messages": []
+  },
+  {
+    "sessionId": "c527d1a0-fe30-479e-a7e5-f81e12592a71",
+    "startTime": "2025-07-10T20:42:44.621336",
+    "messages": [
+      {
+        "timestamp": "2025-07-10T20:43:22.402419",
+        "userInput": "Hi, my name is Adam.",
+        "emotion": "neutral",
+        "confidence": 0.0,
+        "botResponse": "Hi Adam! It's great to meet you. What's on your mind today?"
+      },
+      {
+        "timestamp": "2025-07-10T20:43:42.636588",
+        "userInput": "I'm just thinking if it's going to work.",
+        "emotion": "anxious",
+        "confidence": 0.85,
+        "botResponse": "That sounds important to you. Can you tell me a bit more about what you're hoping will work?"
+      }
+    ]
+  },
+  {
+    "sessionId": "9d9bf49b-d984-43a6-ba95-31872ee1a579",
+    "startTime": "2025-07-10T20:49:10.668231",
+    "messages": []
+  },
+  {
+    "sessionId": "de56ec72-4f65-49a4-a6e7-a8151c1ae9e1",
+    "startTime": "2025-07-10T20:50:55.756919",
+    "messages": [
+      {
+        "timestamp": "2025-07-10T20:51:10.766624",
+        "userInput": "Hi, my name is Adam.",
+        "emotion": "neutral",
+        "confidence": 0.0,
+        "botResponse": "Hi Adam! It's great to meet you. What's on your mind today?"
+      }
+    ]
+  },
+  {
+    "sessionId": "32068adb-3832-4405-9fb4-47919f53a9be",
+    "startTime": "2025-07-10T20:55:21.733773",
+    "messages": []
+  },
+  {
+    "sessionId": "71dbc7b3-1bcb-41e5-b0f4-67abe2ee1cc5",
+    "startTime": "2025-07-10T20:58:02.010217",
+    "messages": []
+  },
+  {
+    "sessionId": "2645b0b7-a230-46ca-a470-5175301d2d40",
+    "startTime": "2025-07-10T21:00:26.849427",
+    "messages": []
+  },
+  {
+    "sessionId": "c979ce3b-d8bf-4413-bfd2-a3c45940be06",
+    "startTime": "2025-07-10T21:01:12.503641",
+    "messages": [
+      {
+        "timestamp": "2025-07-10T21:01:27.038508",
+        "userInput": "Hi, my name is Adam.",
+        "emotion": "neutral",
+        "confidence": 0.0,
+        "botResponse": "Hi Adam! It's great to meet you. How are you feeling today?"
+      }
+    ]
+  },
+  {
+    "sessionId": "6e1bebf6-7898-47fe-9321-bcdf3c13cdfa",
+    "startTime": "2025-07-10T21:18:53.286151",
+    "messages": [
+      {
+        "timestamp": "2025-07-10T21:19:04.363308",
+        "userInput": "Hi my name is Adam",
+        "emotion": "neutral",
+        "confidence": 0.0,
+        "botResponse": "Hi Adam! It’s great to meet you. How are you feeling today?"
+      },
+      {
+        "timestamp": "2025-07-10T21:19:26.188317",
+        "userInput": "🎤 I'm okay, I just want to talk.",
+        "emotion": "neutral",
+        "confidence": 0.0,
+        "botResponse": "That sounds good! What’s on your mind? Anything specific you’d like to share?"
+      },
+      {
+        "timestamp": "2025-07-10T21:19:43.506770",
+        "userInput": "🎤 Hmm, nothing pretty.",
+        "emotion": "neutral",
+        "confidence": 0.0,
+        "botResponse": "That’s okay! Sometimes it’s hard to find the right words. What’s something that’s been on your mind lately? Would you like to tell me more about what's making you feel this way?"
+      }
+    ]
   }
 ]

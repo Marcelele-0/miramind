@@ -334,23 +334,34 @@ export default function CallPage() {
         setVolume(0);
       };
 
-      // Simple volume simulation without WebAudio API
+      // Enhanced volume simulation with more realistic audio-correlated animation
       const simulateVolume = () => {
         if (
           audioRef.current &&
           !audioRef.current.paused &&
           !audioRef.current.ended
         ) {
-          // Simulate volume with a simple animation
           const currentTime =
             audioRef.current.currentTime || 0;
           const duration = audioRef.current.duration || 1;
-          const progress = currentTime / duration;
 
-          // Create a simple wave-like volume effect
-          const simVolume =
-            Math.sin(currentTime * 10) * 20 + 30;
-          setVolume(Math.abs(simVolume));
+          // Create multiple frequency components for more realistic visualization
+          const baseFreq = Math.sin(currentTime * 8) * 25;
+          const midFreq = Math.sin(currentTime * 15) * 15;
+          const highFreq = Math.sin(currentTime * 25) * 10;
+
+          // Add some randomness to simulate speech patterns
+          const speechPattern = Math.random() * 20;
+
+          // Combine frequencies with some decay for natural feel
+          const combinedVolume = Math.abs(
+            baseFreq + midFreq + highFreq + speechPattern
+          );
+
+          // Add slight pulsing effect
+          const pulse = Math.sin(currentTime * 3) * 5 + 5;
+
+          setVolume(Math.min(combinedVolume + pulse, 80));
 
           animationFrameRef.current =
             requestAnimationFrame(simulateVolume);
@@ -658,18 +669,53 @@ export default function CallPage() {
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24 bg-[#c7afd5]">
-      <div className="w-72 h-72 rounded-full bg-[#dcd3f2] mb-10 flex items-center justify-center">
+      <div className="w-72 h-72 rounded-full bg-[#dcd3f2] mb-10 flex items-center justify-center relative overflow-hidden">
+        {/* Animated background rings when audio is playing */}
+        {isPlaying && (
+          <>
+            <div
+              className="absolute inset-0 rounded-full border-4 border-[#4dff5f] opacity-20"
+              style={{
+                transform: `scale(${Math.min(
+                  1 + volume / 150,
+                  1.3
+                )})`,
+                transition:
+                  "transform 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
+              }}
+            />
+            <div
+              className="absolute inset-2 rounded-full border-2 border-[#f9c6cd] opacity-40"
+              style={{
+                transform: `scale(${Math.min(
+                  1 + volume / 200,
+                  1.2
+                )})`,
+                transition:
+                  "transform 0.25s cubic-bezier(0.4, 0, 0.2, 1)",
+              }}
+            />
+          </>
+        )}
+
         <img
           src="/images/sound.png"
           alt="sound"
           width={250}
           height={250}
+          className="relative z-10"
           style={{
             transform: `scale(${Math.min(
-              1 + volume / 100,
-              1.5
-            )})`,
-            transition: "transform 0.05s linear",
+              1 + volume / 120,
+              1.4
+            )}) rotate(${isPlaying ? volume / 20 : 0}deg)`,
+            transition:
+              "transform 0.15s cubic-bezier(0.4, 0, 0.2, 1)",
+            filter: isPlaying
+              ? `brightness(${1 + volume / 300}) saturate(${
+                  1 + volume / 150
+                })`
+              : "none",
           }}
         />
       </div>

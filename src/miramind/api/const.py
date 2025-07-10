@@ -26,4 +26,4 @@ CORS_ALLOW_METHODS = ["*"]
 CORS_ALLOW_HEADERS = ["*"]
 
 # Timeout settings
-SCRIPT_EXECUTION_TIMEOUT = 60  # seconds
+SCRIPT_EXECUTION_TIMEOUT = 30  # Reduced from 60 seconds for faster failure detection

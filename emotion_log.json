@@ -1,0 +1,20 @@
+[
+  {
+    "input": "Hi my name is Adam",
+    "emotion": "neutral",
+    "confidence": 0.85,
+    "response": "Hi Adam! It\u2019s great to meet you. How are you feeling today?"
+  },
+  {
+    "input": "I'm okay, I just want to talk.",
+    "emotion": "neutral",
+    "confidence": 0.85,
+    "response": "That sounds good! What\u2019s on your mind? Anything specific you\u2019d like to share?"
+  },
+  {
+    "input": "Hmm, nothing pretty.",
+    "emotion": "sad",
+    "confidence": 0.85,
+    "response": "That\u2019s okay! Sometimes it\u2019s hard to find the right words. What\u2019s something that\u2019s been on your mind lately?"
+  }
+]

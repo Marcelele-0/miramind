@@ -382,5 +382,119 @@
     "emotion": "neutral",
     "confidence": 0.85,
     "response": "Okay, glad to hear it! Is there anything specific you'd like to talk about or share?"
+  },
+  {
+    "input": "Hi there, is everything ok?",
+    "emotion": "neutral",
+    "confidence": 0.0,
+    "response": "Hi! I'm here and ready to chat. How are you feeling today?"
+  },
+  {
+    "input": "I'm fine, I'm just checking out.",
+    "emotion": "neutral",
+    "confidence": 0.0,
+    "response": "That's okay! If you ever feel like talking about anything, whether it's fun stuff or something on your mind, I'm here for you. What's something fun you did recently?"
+  },
+  {
+    "input": "Hi there!",
+    "emotion": "neutral",
+    "confidence": 0.0,
+    "response": "Hello! How are you feeling today?"
+  },
+  {
+    "input": "I'm fine",
+    "emotion": "neutral",
+    "confidence": 0.0,
+    "response": "Got it. Anything on your mind you'd like to chat about?"
+  },
+  {
+    "input": "Nah, I'm just joking.",
+    "emotion": "neutral",
+    "confidence": 0.0,
+    "response": "Got it! Jokes can be a fun way to express ourselves. Is there anything else on your mind or something you'd like to share or talk about?"
+  },
+  {
+    "input": "Bye.",
+    "emotion": "neutral",
+    "confidence": 0.0,
+    "response": "Hey there! It seems like you might be ready to go. If you ever want to chat, I'm here for you. Take care!"
+  },
+  {
+    "input": "Is the animation changed?",
+    "emotion": "neutral",
+    "confidence": 0.0,
+    "response": "Are you noticing something different about an animation you like? Sometimes shows or games update their style, and it can feel a bit strange at first. What do you think about the changes?"
+  },
+  {
+    "input": "I just want to know if everything is working okay.",
+    "emotion": "anxious",
+    "confidence": 0.85,
+    "response": "It sounds like you're checking to see if things are as they should be. Is there something specific you're concerned about, or is it just a general feeling?"
+  },
+  {
+    "input": "one more check",
+    "emotion": "neutral",
+    "confidence": 0.0,
+    "response": "It sounds like you might be feeling a bit repetitive or stuck. What's on your mind right now that you'd like to talk about?"
+  },
+  {
+    "input": "Nothing special.",
+    "emotion": "neutral",
+    "confidence": 0.0,
+    "response": "That's okay! Sometimes it's nice to just chat about everyday things. Is there anything fun or interesting you've done recently?"
+  },
+  {
+    "input": "Hi there, my name is Adam. Is it even working properly? I'm not sure if it's working properly. I'm not sure if it's working properly. I'm not sure if it's working properly. I'm not sure if it's working properly.",
+    "emotion": "anxious",
+    "confidence": 0.85,
+    "response": "Hi Adam! It sounds like you're feeling a bit unsure about something. Can you tell me what's on your mind? Maybe we can figure it out together."
+  },
+  {
+    "input": "Hi there, my name's Adam.",
+    "emotion": "neutral",
+    "confidence": 0.0,
+    "response": "Hi Adam! It's nice to meet you. How are you feeling today?"
+  },
+  {
+    "input": "Ci\u0119\u017cko.",
+    "emotion": "sad",
+    "confidence": 0.85,
+    "response": "Rozumiem, \u017ce mo\u017ce by\u0107 trudno. Chcesz mi opowiedzie\u0107, co si\u0119 dzieje?"
+  },
+  {
+    "input": "I said I'm tired",
+    "emotion": "neutral",
+    "confidence": 0.0,
+    "response": "Thanks for letting me know. Being tired can make everything feel a bit harder. Do you know what's been making you feel tired lately?"
+  },
+  {
+    "input": "Ippu.",
+    "emotion": "neutral",
+    "confidence": 0.0,
+    "response": "Got it. It sounds like you might be saying \"I don't know\" or something similar. It's okay not to have all the answers right now. Is there anything you usually do that helps when you feel this way?"
+  },
+  {
+    "input": "Hi, my name is Adam.",
+    "emotion": "neutral",
+    "confidence": 0.0,
+    "response": "Hi Adam! It's great to meet you. What's on your mind today?"
+  },
+  {
+    "input": "I'm just thinking if it's going to work.",
+    "emotion": "anxious",
+    "confidence": 0.85,
+    "response": "That sounds important to you. Can you tell me a bit more about what you're hoping will work?"
+  },
+  {
+    "input": "Hi, my name is Adam.",
+    "emotion": "neutral",
+    "confidence": 0.0,
+    "response": "Hi Adam! It's great to meet you. What's on your mind today?"
+  },
+  {
+    "input": "Hi, my name is Adam.",
+    "emotion": "neutral",
+    "confidence": 0.0,
+    "response": "Hi Adam! It's great to meet you. How are you feeling today?"
   }
 ]

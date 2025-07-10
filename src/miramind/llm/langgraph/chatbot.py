@@ -26,17 +26,13 @@ logger.info("Logger is working inside chatbot.py")
 
 # --- Config ---
 DEFAULT_MODEL = "gpt-4o-mini"  # Faster and cheaper model for emotion detection
-RESPONSE_MODEL = "gpt-4o"  # Keep higher quality model for responses
+RESPONSE_MODEL = "gpt-4o-mini"  # Use faster model for responses too
 LOG_FILE = "emotion_log.json"
 VALID_EMOTIONS = {"happy", "sad", "angry", "scared", "excited", "embarrassed", "anxious", "neutral"}
 EMOTION_PROMPT = (
-    "You are a non-licensed therapist specialized in neurodivergent children. "
-    "You are great at recognizing children's emotions. "
-    "Classify the following message as one of: happy, sad, angry, scared, excited, embarrassed, anxious, or neutral. "
-    "Respond in JSON format like this: {\"emotion\": \"happy\", \"confidence\": 0.92} "
-    "Adjust your response based on the child's emotional state. "
-    "If you cannot determine the emotion, return neutral with confidence 0.0. "
-    "Do not include any emojis."
+    "Classify emotion as: happy, sad, angry, scared, excited, embarrassed, anxious, or neutral. "
+    "Respond in JSON: {\"emotion\": \"happy\", \"confidence\": 0.92} "
+    "Be concise."  # Shortened prompt for faster processing
 )
 
 
@@ -71,8 +67,8 @@ def detect_emotion(state: Dict[str, Any]) -> Dict[str, Any]:
         {"role": "user", "content": user_input},
     ]
 
-    # Use faster model for emotion detection with token limit
-    raw = call_openai(client, messages, model=DEFAULT_MODEL, max_tokens=50)
+    # Use faster model for emotion detection with reduced token limit
+    raw = call_openai(client, messages, model=DEFAULT_MODEL, max_tokens=30)
     emotion, confidence = "neutral", 0.0
 
     try:

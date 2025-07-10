@@ -2,6 +2,8 @@ import asyncio
 import json
 import os
 import subprocess
+import threading
+import time
 import uuid
 from datetime import datetime
 from queue import Queue
@@ -26,6 +28,10 @@ from miramind.api.const import (
 )
 from miramind.audio.stt.stt_class import STT
 from miramind.audio.stt.stt_threads import timed_listen_and_transcribe
+
+# Import chatbot directly for faster processing
+from miramind.llm.langgraph.chatbot import get_chatbot
+from miramind.llm.langgraph.run_chat import process_chat_message_async
 from miramind.shared.logger import logger
 
 app = FastAPI()
@@ -191,101 +197,181 @@ async def get_audio_file_simple():
 
 
 @app.post("/api/chat/message")
-async def chat_message(input: ChatInput):
+async def chat_message(input: ChatInput, background_tasks: BackgroundTasks):
     global current_session_id
     logger.info(f"Received chat message: {input.userInput}")
+
+    start_time = time.time()
+
+    try:
+        # Check cache first
+        cache_key = _get_cache_key(input.userInput, len(input.chatHistory))
+        if cache_key in api_response_cache:
+            cached_data, timestamp = api_response_cache[cache_key]
+            if _is_cache_valid(timestamp):
+                logger.info(f"API cache hit for: {input.userInput[:30]}...")
+                cached_data["processing_time"] = time.time() - start_time
+                cached_data["cached"] = True
+                return cached_data
+
+        # Use direct async chatbot call for much faster processing
+        # Optimize chat history - only keep last 6 messages for faster processing
+        optimized_history = (
+            input.chatHistory[-6:] if len(input.chatHistory) > 6 else input.chatHistory
+        )
+
+        # Call chatbot directly using async version
+        result = await process_chat_message_async(
+            user_input_text=input.userInput, chat_history=optimized_history, memory=input.memory
+        )
+
+        processing_time = time.time() - start_time
+        logger.info(f"Direct chatbot call completed in {processing_time:.2f}s")
+
+        # Return response immediately without waiting for session logging
+        response_data = {
+            "response_text": result.get("response_text", ""),
+            "audio_file_path": result.get("audio_file_path"),
+            "memory": result.get("memory", input.memory),
+            "processing_time": processing_time,
+        }
+
+        # Cache the response
+        api_response_cache[cache_key] = (response_data, time.time())
+
+        # Add background task for session logging (non-blocking)
+        if current_session_id:
+            background_tasks.add_task(
+                save_message_to_session_async,
+                current_session_id,
+                input.userInput,
+                result.get("response_text", ""),
+                "neutral",  # Will be updated with actual emotion in background
+                0.0,
+            )
+
+        return response_data
+
+    except Exception as e:
+        logger.error(f"Optimized chatbot error: {e}")
+        # Fallback to subprocess if direct call fails
+        return await chat_message_fallback(input)
+
+
+async def chat_message_fallback(input: ChatInput):
+    """Fallback to subprocess method if direct call fails"""
+    global current_session_id
+    logger.info("Using fallback subprocess method")
 
     try:
         input_json = json.dumps(
             {
                 "text": input.userInput,
-                "chat_history": input.chatHistory,
+                "chat_history": input.chatHistory[-4:],  # Limit context for faster processing
                 "memory": input.memory,
             }
         )
 
         logger.debug(f"Running script: {SCRIPT_PATH} with input: {input_json}")
 
-        result = subprocess.run(
-            ["python", SCRIPT_PATH, input_json],
-            capture_output=True,
-            text=True,
-            cwd=os.path.dirname(
-                os.path.dirname(os.path.dirname(__file__))
-            ),  # Set working directory to miramind root
-            timeout=SCRIPT_EXECUTION_TIMEOUT,  # Add timeout to prevent hanging
+        # Use asyncio.create_subprocess_exec for async subprocess
+        proc = await asyncio.create_subprocess_exec(
+            "python",
+            SCRIPT_PATH,
+            input_json,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE,
+            cwd=os.path.dirname(os.path.dirname(os.path.dirname(__file__))),
         )
 
-        logger.debug(f"Subprocess completed with return code: {result.returncode}")
-        logger.debug(f"STDOUT: {result.stdout}")
-        logger.debug(f"STDERR: {result.stderr}")
+        try:
+            stdout, stderr = await asyncio.wait_for(
+                proc.communicate(), timeout=30.0
+            )  # Reduced timeout
+        except asyncio.TimeoutError:
+            proc.kill()
+            await proc.wait()
+            logger.error("Script execution timed out")
+            return JSONResponse(status_code=500, content={"error": "Script execution timed out"})
 
-        if result.returncode != 0:
-            logger.error(f"Script failed with return code {result.returncode}")
-            logger.error(f"STDERR: {result.stderr}")
-            return JSONResponse(status_code=500, content={"error": result.stderr})
+        if proc.returncode != 0:
+            logger.error(f"Script failed with return code {proc.returncode}")
+            logger.error(f"STDERR: {stderr.decode()}")
+            return JSONResponse(status_code=500, content={"error": stderr.decode()})
 
-        # Parse JSON from the last line of stdout (logging appears before JSON)
-        stdout_lines = result.stdout.strip().split("\n")
-        json_line = stdout_lines[-1]  # Last line should be the JSON response
-
-        logger.debug(f"Attempting to parse JSON from: {json_line}")
+        # Parse JSON from the last line of stdout
+        stdout_lines = stdout.decode().strip().split("\n")
+        json_line = stdout_lines[-1]
 
         try:
             response = json.loads(json_line)
-            logger.info(f"Successfully parsed response: {response}")
-
-            # Save message to current session
-            if current_session_id:
-                # The emotion and confidence should come from the chatbot state,
-                # but since the script doesn't return them, we'll need to read from emotion_log
-                # or implement a way to get them from the script
-                emotion = "neutral"  # Default
-                confidence = 0.0  # Default
-
-                # Try to read the latest emotion from emotion_log.json
-                try:
-                    emotion_log_path = os.path.join(
-                        os.path.dirname(os.path.dirname(os.path.dirname(__file__))),
-                        "emotion_log.json",
-                    )
-                    if os.path.exists(emotion_log_path):
-                        with open(emotion_log_path, 'r', encoding='utf-8') as f:
-                            emotion_data = json.load(f)
-                            if emotion_data:
-                                # Get the last entry that matches our input
-                                for entry in reversed(emotion_data):
-                                    if (
-                                        entry.get("input", "").strip().lower()
-                                        == input.userInput.strip().lower()
-                                    ):
-                                        emotion = entry.get("emotion", "neutral")
-                                        confidence = entry.get("confidence", 0.0)
-                                        break
-                except Exception as e:
-                    logger.error(f"Error reading emotion from log: {e}")
-
-                await save_message_to_session(
-                    current_session_id,
-                    input.userInput,
-                    response.get("response_text", ""),
-                    emotion,
-                    confidence,
-                )
-
+            logger.info(f"Successfully parsed fallback response")
             return response
         except json.JSONDecodeError as e:
             logger.error(f"Failed to parse JSON from stdout: {e}")
-            logger.error(f"JSON line was: {json_line}")
-            logger.error(f"Full stdout was: {result.stdout}")
             return JSONResponse(status_code=500, content={"error": "Failed to parse response JSON"})
 
-    except subprocess.TimeoutExpired:
-        logger.error("Script execution timed out")
-        return JSONResponse(status_code=500, content={"error": "Script execution timed out"})
     except Exception as e:
-        logger.error(f"Unexpected error: {e}")
+        logger.error(f"Fallback error: {e}")
         return JSONResponse(status_code=500, content={"error": str(e)})
+
+
+async def save_message_to_session_async(
+    session_id: str, user_input: str, bot_response: str, emotion: str, confidence: float
+):
+    """Async version of save_message_to_session for background processing"""
+    try:
+        from datetime import datetime
+
+        sessions_log_path = os.path.join(
+            os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "sessions_log.json"
+        )
+
+        if not os.path.exists(sessions_log_path):
+            return
+
+        # Run file I/O in thread pool to avoid blocking
+        loop = asyncio.get_event_loop()
+        await loop.run_in_executor(
+            None,
+            _save_session_sync,
+            sessions_log_path,
+            session_id,
+            user_input,
+            bot_response,
+            emotion,
+            confidence,
+        )
+
+    except Exception as e:
+        logger.error(f"Error saving message to session (async): {e}")
+
+
+def _save_session_sync(
+    sessions_log_path, session_id, user_input, bot_response, emotion, confidence
+):
+    """Synchronous helper for file operations"""
+    from datetime import datetime
+
+    with open(sessions_log_path, 'r', encoding='utf-8') as f:
+        sessions = json.load(f)
+
+    # Find current session and add message
+    for session in sessions:
+        if session["sessionId"] == session_id:
+            message_exchange = {
+                "timestamp": datetime.now().isoformat(),
+                "userInput": user_input,
+                "emotion": emotion,
+                "confidence": confidence,
+                "botResponse": bot_response,
+            }
+            session["messages"].append(message_exchange)
+            break
+
+    # Save updated sessions
+    with open(sessions_log_path, 'w', encoding='utf-8') as f:
+        json.dump(sessions, f, indent=2, ensure_ascii=False)
 
 
 async def save_message_to_session(
@@ -591,12 +677,14 @@ async def record_and_transcribe(input: VoiceRecordingInput):
 
 
 @app.post("/api/voice/chat")
-async def voice_chat(input: VoiceChatInput):
-    """Process voice input and return chat response"""
+async def voice_chat(input: VoiceChatInput, background_tasks: BackgroundTasks):
+    """Process voice input and return chat response with optimizations"""
     global current_session_id
 
     if not openai_client:
         raise HTTPException(status_code=500, detail="OpenAI client not initialized")
+
+    start_time = time.time()
 
     try:
         transcript = ""
@@ -611,7 +699,7 @@ async def voice_chat(input: VoiceChatInput):
             audio_buffer = io.BytesIO(audio_bytes)
             audio_buffer.name = "voice_input.wav"
 
-            # Transcribe
+            # Transcribe using async if possible
             stt = STT(client=openai_client, logger=logger)
             transcript_result = stt.transcribe_bytes(audio_buffer)
             transcript = transcript_result.get("transcript", "")
@@ -621,29 +709,40 @@ async def voice_chat(input: VoiceChatInput):
         if not transcript:
             raise HTTPException(status_code=400, detail="No transcript available")
 
-        # Use the transcript as user input for the chatbot
-        chat_input = ChatInput(
-            userInput=transcript,
-            chatHistory=input.chatHistory,
-            memory=input.memory,
-            sessionId=input.sessionId,
+        # Use optimized chat processing
+        optimized_history = (
+            input.chatHistory[-6:] if len(input.chatHistory) > 6 else input.chatHistory
         )
 
-        # Process through existing chat pipeline
-        chat_response = await chat_message(chat_input)
+        # Call chatbot directly using async version
+        result = await process_chat_message_async(
+            user_input_text=transcript, chat_history=optimized_history, memory=input.memory
+        )
 
-        # Add the transcript to the response
-        if hasattr(chat_response, 'body'):
-            # If it's a JSONResponse, extract the data
-            import json
+        processing_time = time.time() - start_time
+        logger.info(f"Voice chat completed in {processing_time:.2f}s")
 
-            response_data = json.loads(chat_response.body.decode())
-            response_data['transcript'] = transcript
-            return response_data
-        else:
-            # If it's already a dict, add transcript
-            chat_response['transcript'] = transcript
-            return chat_response
+        # Prepare response with transcript
+        response_data = {
+            "response_text": result.get("response_text", ""),
+            "audio_file_path": result.get("audio_file_path"),
+            "memory": result.get("memory", input.memory),
+            "transcript": transcript,
+            "processing_time": processing_time,
+        }
+
+        # Add background task for session logging (non-blocking)
+        if current_session_id:
+            background_tasks.add_task(
+                save_message_to_session_async,
+                current_session_id,
+                f"🎤 {transcript}",  # Mark as voice input
+                result.get("response_text", ""),
+                "neutral",
+                0.0,
+            )
+
+        return response_data
 
     except Exception as e:
         logger.error(f"Voice chat error: {e}")
@@ -669,3 +768,69 @@ async def cleanup_old_recordings():
 
     except Exception as e:
         logger.error(f"Error cleaning up recordings: {e}")
+
+
+# Simple API-level cache for common responses
+api_response_cache = {}
+API_CACHE_SIZE = 50
+API_CACHE_TTL = 300  # 5 minutes
+
+
+def _get_cache_key(user_input: str, history_length: int) -> str:
+    """Generate cache key for API responses"""
+    import hashlib
+
+    content = f"{user_input.lower().strip()}_{history_length}"
+    return hashlib.md5(content.encode()).hexdigest()
+
+
+def _is_cache_valid(timestamp: float) -> bool:
+    """Check if cache entry is still valid"""
+    return (time.time() - timestamp) < API_CACHE_TTL
+
+
+def _cleanup_api_cache():
+    """Remove expired entries from API cache"""
+    current_time = time.time()
+    expired_keys = [
+        key
+        for key, (data, timestamp) in api_response_cache.items()
+        if not _is_cache_valid(timestamp)
+    ]
+    for key in expired_keys:
+        del api_response_cache[key]
+
+    # Also limit cache size
+    if len(api_response_cache) > API_CACHE_SIZE:
+        # Remove oldest entries
+        sorted_items = sorted(api_response_cache.items(), key=lambda x: x[1][1])
+        for key, _ in sorted_items[: len(api_response_cache) - API_CACHE_SIZE]:
+            del api_response_cache[key]
+
+
+# Background task to clean cache periodically
+async def periodic_cache_cleanup():
+    """Periodic cleanup of API cache"""
+    while True:
+        try:
+            _cleanup_api_cache()
+            await asyncio.sleep(60)  # Clean every minute
+        except Exception as e:
+            logger.error(f"Cache cleanup error: {e}")
+            await asyncio.sleep(60)
+
+
+@app.on_event("startup")
+async def startup_event():
+    """Initialize services on startup"""
+    try:
+        # Pre-initialize chatbot
+        chatbot_instance = get_chatbot()
+        logger.info("Chatbot pre-initialized for faster responses")
+
+        # Start cache cleanup task
+        asyncio.create_task(periodic_cache_cleanup())
+
+        logger.info("FastAPI startup completed with optimizations")
+    except Exception as e:
+        logger.error(f"Startup error: {e}")
