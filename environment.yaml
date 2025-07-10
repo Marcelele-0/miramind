@@ -1,0 +1,20 @@
+name: miramind
+channels:
+  - defaults
+  - conda-forge
+dependencies:
+  - python=3.10
+  - pip
+  - pip:
+      - python-dotenv
+      - mypy
+      - pre-commit
+      - azure-cognitiveservices-speech
+      - pytest
+      - langchain
+      - langgraph
+      - soundfile
+      - torchaudio
+      - torch
+      - tqdm
+      - isort
