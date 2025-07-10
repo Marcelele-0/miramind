@@ -70,6 +70,7 @@ build/
 out/
 
 # === Logs / debug / telemetry ===
+*log.json
 *.log
 *.out
 logs/
