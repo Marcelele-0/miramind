@@ -44,14 +44,17 @@ dependencies = [
     "langchain>=0.1.0",
     "langchain-core>=0.1.0",
     "langgraph>=0.0.40",
-    # pytest for tests
 
+    # pytest for tests
     "pytest",
-    "pytest-mock",
     "pytest-cov",
     "pytest-env",
     "pytest-mock",
+
+    # azure blob storage
     "azure-storage-blob",
+
+    # package for creating docs
     "pydoc-markdown"
 ]
 
