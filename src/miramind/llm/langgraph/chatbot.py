@@ -18,14 +18,15 @@ from miramind.llm.langgraph.subgraphs import (
     build_neutral_flow,
     build_sad_flow,
 )
-from miramind.llm.langgraph.utils import call_openai
+from miramind.llm.langgraph.utils import EmotionLogger, call_openai
 from miramind.shared.logger import logger
 
 logger.info("Logger is working inside chatbot.py")
 
 
 # --- Config ---
-DEFAULT_MODEL = "gpt-4o"
+DEFAULT_MODEL = "gpt-4o-mini"  # Faster and cheaper model for emotion detection
+RESPONSE_MODEL = "gpt-4o"  # Keep higher quality model for responses
 LOG_FILE = "emotion_log.json"
 VALID_EMOTIONS = {"happy", "sad", "angry", "scared", "excited", "embarrassed", "anxious", "neutral"}
 EMOTION_PROMPT = (
@@ -44,12 +45,14 @@ def initialize_clients():
     load_dotenv()
     openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
     tts = get_tts_provider("azure")
-    return openai_client, tts
+    logger_instance = EmotionLogger(LOG_FILE)
+    return openai_client, tts, logger_instance
 
 
 # --- Global Variables (initialized in main) ---
 client = None
 tts_provider = None
+emotion_logger = None
 
 
 # --- Models ---
@@ -68,7 +71,8 @@ def detect_emotion(state: Dict[str, Any]) -> Dict[str, Any]:
         {"role": "user", "content": user_input},
     ]
 
-    raw = call_openai(messages)
+    # Use faster model for emotion detection with token limit
+    raw = call_openai(client, messages, model=DEFAULT_MODEL, max_tokens=50)
     emotion, confidence = "neutral", 0.0
 
     try:
@@ -79,7 +83,7 @@ def detect_emotion(state: Dict[str, Any]) -> Dict[str, Any]:
                 emotion = parsed.emotion
                 confidence = parsed.confidence
     except ValidationError as e:
-        logger.error(f"Emotion parsing error: {e}")  # ✅ Replaced print with logger
+        logger.error(f"Emotion parsing error: {e}")
 
     return {
         **state,
@@ -103,11 +107,19 @@ def get_graph():
     main_graph.add_node("detect_emotion", RunnableLambda(detect_emotion))
 
     # Add subgraphs for each emotional path
-    main_graph.add_node("sad_flow", build_sad_flow().compile())
-    main_graph.add_node("angry_flow", build_angry_flow().compile())
-    main_graph.add_node("excited_flow", build_excited_flow().compile())
-    main_graph.add_node("gentle_flow", build_gentle_flow().compile())
-    main_graph.add_node("neutral_flow", build_neutral_flow().compile())
+    main_graph.add_node("sad_flow", build_sad_flow(client, tts_provider, emotion_logger).compile())
+    main_graph.add_node(
+        "angry_flow", build_angry_flow(client, tts_provider, emotion_logger).compile()
+    )
+    main_graph.add_node(
+        "excited_flow", build_excited_flow(client, tts_provider, emotion_logger).compile()
+    )
+    main_graph.add_node(
+        "gentle_flow", build_gentle_flow(client, tts_provider, emotion_logger).compile()
+    )
+    main_graph.add_node(
+        "neutral_flow", build_neutral_flow(client, tts_provider, emotion_logger).compile()
+    )
 
     # Set entry and conditional routing
     main_graph.set_entry_point("detect_emotion")
@@ -133,17 +145,34 @@ def main():
     """
     Main function to initialize clients and set up the chatbot.
     """
-    global client, tts_provider
+    global client, tts_provider, emotion_logger
 
     # Initialize clients and environment
-    client, tts_provider = initialize_clients()
+    client, tts_provider, emotion_logger = initialize_clients()
 
     # Create and return the chatbot
     return get_graph()
 
 
 # --- Final Compiled Graph ---
-chatbot = None  # Will be initialized when main() is called
+# Initialize the chatbot when the module is imported
+chatbot = None
+
+
+def get_chatbot():
+    """
+    Returns the initialized chatbot, creating it if necessary.
+    This ensures the chatbot is properly initialized regardless of how the module is used.
+    """
+    global chatbot
+    if chatbot is None:
+        chatbot = main()
+    return chatbot
+
+
+# Initialize immediately for backward compatibility
+chatbot = get_chatbot()
 
 if __name__ == "__main__":
-    chatbot = main()
+    # When run directly, chatbot is already initialized
+    pass

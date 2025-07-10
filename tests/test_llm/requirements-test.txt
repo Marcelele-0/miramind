@@ -1,0 +1,9 @@
+# Test dependencies for MiraMind LLM/LangGraph tests
+pytest>=8.0.0
+pytest-asyncio>=1.0.0
+pytest-cov>=6.0.0
+pytest-mock>=3.14.0
+pytest-env>=1.1.0
+
+# Development dependencies
+psutil>=5.9.0  # For performance monitoring tests

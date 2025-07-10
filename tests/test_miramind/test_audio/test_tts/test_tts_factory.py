@@ -1,12 +1,13 @@
-import pytest
 import os
 import sys
+
+import pytest
 
 # Add src to path for imports
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", "..", ".."))
 
-from src.miramind.audio.tts.tts_base import TTSProvider
 from src.miramind.audio.tts.tts_azure import AzureTTSProvider
+from src.miramind.audio.tts.tts_base import TTSProvider
 from src.miramind.audio.tts.tts_factory import get_tts_provider
 
 
@@ -18,9 +19,9 @@ class TestTTSFactorySimple:
         with pytest.MonkeyPatch().context() as mp:
             mp.setenv("AZURE_SPEECH_ENDPOINT", "https://test.api.cognitive.microsoft.com/")
             mp.setenv("AZURE_SPEECH_KEY", "test_key")
-            
+
             provider = get_tts_provider("azure")
-            
+
             assert provider is not None
             assert hasattr(provider, 'synthesize')
             assert hasattr(provider, 'set_emotion')
@@ -32,9 +33,9 @@ class TestTTSFactorySimple:
         with pytest.MonkeyPatch().context() as mp:
             mp.setenv("AZURE_SPEECH_ENDPOINT", "https://test.api.cognitive.microsoft.com/")
             mp.setenv("AZURE_SPEECH_KEY", "test_key")
-            
+
             provider = get_tts_provider()  # No provider name specified
-            
+
             assert provider is not None
             assert hasattr(provider, 'synthesize')
 
@@ -48,14 +49,13 @@ class TestTTSFactorySimple:
         test_endpoint = "https://custom.endpoint.com/"
         test_key = "custom_key_123"
         test_voice = "en-US-AriaNeural"
-        
         with pytest.MonkeyPatch().context() as mp:
             mp.setenv("AZURE_SPEECH_ENDPOINT", test_endpoint)
             mp.setenv("AZURE_SPEECH_KEY", test_key)
             mp.setenv("AZURE_SPEECH_VOICE_NAME", test_voice)
-            
+
             provider = get_tts_provider("azure")
-            
+
             assert provider.endpoint == test_endpoint
             assert provider.subscription_key == test_key
             assert provider.voice_name == test_voice

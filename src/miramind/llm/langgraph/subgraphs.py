@@ -7,12 +7,14 @@ from miramind.llm.langgraph.utils import generate_response
 from miramind.shared.logger import logger
 
 
-def build_sad_flow():
+def build_sad_flow(client, tts_provider, emotion_logger):
     graph = StateGraph(dict)
 
     def supportive_responder(state: Dict[str, Any]) -> Dict[str, Any]:
         logger.info("Entered SAD flow")
-        return generate_response("supportive and caring")(state)
+        return generate_response("supportive and caring", client, tts_provider, emotion_logger)(
+            state
+        )
 
     def follow_up(state: Dict[str, Any]) -> Dict[str, Any]:
         logger.info(" SAD flow: adding follow-up message")
@@ -32,12 +34,12 @@ def build_sad_flow():
     return graph
 
 
-def build_angry_flow():
+def build_angry_flow(client, tts_provider, emotion_logger):
     graph = StateGraph(dict)
 
     def calm_responder(state: Dict[str, Any]) -> Dict[str, Any]:
         logger.info(" Entered ANGRY flow")
-        return generate_response("calm and soothing")(state)
+        return generate_response("calm and soothing", client, tts_provider, emotion_logger)(state)
 
     graph.add_node("calm_response", RunnableLambda(calm_responder))
     graph.set_entry_point("calm_response")
@@ -45,12 +47,14 @@ def build_angry_flow():
     return graph
 
 
-def build_excited_flow():
+def build_excited_flow(client, tts_provider, emotion_logger):
     graph = StateGraph(dict)
 
     def enthusiastic_responder(state: Dict[str, Any]) -> Dict[str, Any]:
         logger.info(" Entered EXCITED flow")
-        return generate_response("enthusiastic and cheerful")(state)
+        return generate_response("enthusiastic and cheerful", client, tts_provider, emotion_logger)(
+            state
+        )
 
     graph.add_node("enthusiastic_response", RunnableLambda(enthusiastic_responder))
     graph.set_entry_point("enthusiastic_response")
@@ -58,12 +62,14 @@ def build_excited_flow():
     return graph
 
 
-def build_gentle_flow():
+def build_gentle_flow(client, tts_provider, emotion_logger):
     graph = StateGraph(dict)
 
     def gentle_responder(state: Dict[str, Any]) -> Dict[str, Any]:
         logger.info(" Entered GENTLE flow")
-        return generate_response("gentle and reassuring")(state)
+        return generate_response("gentle and reassuring", client, tts_provider, emotion_logger)(
+            state
+        )
 
     graph.add_node("gentle_response", RunnableLambda(gentle_responder))
     graph.set_entry_point("gentle_response")
@@ -71,12 +77,14 @@ def build_gentle_flow():
     return graph
 
 
-def build_neutral_flow():
+def build_neutral_flow(client, tts_provider, emotion_logger):
     graph = StateGraph(dict)
 
     def neutral_responder(state: Dict[str, Any]) -> Dict[str, Any]:
         logger.info(" Entered NEUTRAL flow")
-        return generate_response("neutral and friendly")(state)
+        return generate_response("neutral and friendly", client, tts_provider, emotion_logger)(
+            state
+        )
 
     graph.add_node("neutral_response", RunnableLambda(neutral_responder))
     graph.set_entry_point("neutral_response")
