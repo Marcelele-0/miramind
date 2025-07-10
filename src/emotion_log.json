@@ -142,5 +142,47 @@
     "emotion": "neutral",
     "confidence": 0.0,
     "response": "Hello! I'm here and ready to chat with you. How are you feeling today?"
+  },
+  {
+    "input": "hi what are you up 2?",
+    "emotion": "neutral",
+    "confidence": 0.0,
+    "response": "Hi there! I'm here to chat with you. What's on your mind today?"
+  },
+  {
+    "input": "im tired",
+    "emotion": "neutral",
+    "confidence": 0.0,
+    "response": "Feeling tired can be tough. Do you want to talk about what's making you feel that way?"
+  },
+  {
+    "input": "i want to run away",
+    "emotion": "anxious",
+    "confidence": 0.85,
+    "response": "It sounds like you're feeling overwhelmed right now. Can you tell me more about what's going on that's making you feel this way?"
+  },
+  {
+    "input": "the other kids are mean to me",
+    "emotion": "sad",
+    "confidence": 0.85,
+    "response": "That sounds really tough. Being treated unkindly can hurt a lot. Have you talked to anyone about what\u2019s been happening, like a teacher or a family member?"
+  },
+  {
+    "input": "they dont understand",
+    "emotion": "sad",
+    "confidence": 0.85,
+    "response": "It can be really frustrating when others don't understand what you're going through. Do you think there\u2019s something specific they don\u2019t get about you, or is it more about how they\u2019re acting towards you?"
+  },
+  {
+    "input": "Hi im Adam",
+    "emotion": "neutral",
+    "confidence": 0.0,
+    "response": "Hi Adam! It's great to meet you. How are you feeling today?"
+  },
+  {
+    "input": "Hello, how are you?",
+    "emotion": "neutral",
+    "confidence": 0.0,
+    "response": "Hi there! I'm here and ready to chat with you. How are you feeling today?"
   }
 ]
