@@ -1,11 +1,17 @@
+import asyncio
 import json
 import os
 import subprocess
+import uuid
+from datetime import datetime
+from queue import Queue
+from typing import Optional
 
-from fastapi import FastAPI
+from fastapi import BackgroundTasks, FastAPI, File, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
+from openai import OpenAI
 from pydantic import BaseModel
 
 from miramind.api.const import (
@@ -18,9 +24,31 @@ from miramind.api.const import (
     SCRIPT_EXECUTION_TIMEOUT,
     SCRIPT_PATH,
 )
+from miramind.audio.stt.stt_class import STT
+from miramind.audio.stt.stt_threads import timed_listen_and_transcribe
 from miramind.shared.logger import logger
 
 app = FastAPI()
+
+# Initialize OpenAI client for STT
+try:
+    from dotenv import load_dotenv
+
+    load_dotenv()
+
+    # Fix SSL certificate issue on Windows
+    import ssl
+
+    ssl_cert_file = os.environ.get('SSL_CERT_FILE')
+    if ssl_cert_file and not os.path.exists(ssl_cert_file):
+        logger.warning(f"SSL_CERT_FILE points to non-existent path: {ssl_cert_file}")
+        os.environ.pop('SSL_CERT_FILE', None)
+
+    openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+    logger.info("OpenAI client initialized for STT")
+except Exception as e:
+    logger.error(f"Failed to initialize OpenAI client: {e}")
+    openai_client = None
 
 # Mount static files for audio
 if os.path.exists(FRONTEND_PUBLIC_PATH):
@@ -54,8 +82,27 @@ class ChatInput(BaseModel):
     sessionId: str = None  # Add session tracking
 
 
+# New input model for voice recording
+class VoiceRecordingInput(BaseModel):
+    duration: int = 10  # Recording duration in seconds
+    chunk_duration: int = 5  # Chunk duration for processing
+    lag: int = 2  # Lag between threads
+    sessionId: str = None
+
+
+# Input model for voice chat (combines STT + chat)
+class VoiceChatInput(BaseModel):
+    audioData: Optional[str] = None  # Base64 encoded audio data
+    chatHistory: list = []
+    memory: str = ""
+    sessionId: str = None
+
+
 # Global variable to track current session
 current_session_id = None
+
+# Store for ongoing voice recordings
+voice_recordings = {}  # session_id -> recording_data
 
 
 @app.post("/api/chat/start")
@@ -113,7 +160,13 @@ async def get_audio_file():
     audio_path = os.path.join(FRONTEND_PUBLIC_PATH, "output.wav")
     if os.path.exists(audio_path):
         return FileResponse(
-            audio_path, media_type="audio/wav", headers={"Cache-Control": "no-cache"}
+            audio_path,
+            media_type="audio/wav",
+            headers={
+                "Cache-Control": "no-cache, no-store, must-revalidate",
+                "Pragma": "no-cache",
+                "Expires": "0",
+            },
         )
     else:
         return JSONResponse(status_code=404, content={"error": "Audio file not found"})
@@ -125,7 +178,13 @@ async def get_audio_file_simple():
     audio_path = os.path.join(FRONTEND_PUBLIC_PATH, "output.wav")
     if os.path.exists(audio_path):
         return FileResponse(
-            audio_path, media_type="audio/wav", headers={"Cache-Control": "no-cache"}
+            audio_path,
+            media_type="audio/wav",
+            headers={
+                "Cache-Control": "no-cache, no-store, must-revalidate",
+                "Pragma": "no-cache",
+                "Expires": "0",
+            },
         )
     else:
         return JSONResponse(status_code=404, content={"error": "Audio file not found"})
@@ -379,3 +438,234 @@ async def debug_files():
         info["output_wav_info"] = {"exists": False, "path": output_wav_path}
 
     return info
+
+
+# Removed duplicate endpoints - using new voice endpoints instead
+
+
+@app.post("/api/voice/upload")
+async def upload_voice(file: UploadFile = File(...)):
+    """Upload and transcribe voice file"""
+    if not openai_client:
+        raise HTTPException(status_code=500, detail="OpenAI client not initialized")
+
+    try:
+        # Validate file type
+        if not file.content_type.startswith('audio/'):
+            raise HTTPException(status_code=400, detail="File must be an audio file")
+
+        # Read audio data
+        audio_data = await file.read()
+
+        # Create STT instance and transcribe
+        stt = STT(client=openai_client, logger=logger)
+
+        # Create a file-like object for the STT
+        import io
+
+        audio_buffer = io.BytesIO(audio_data)
+        audio_buffer.name = file.filename or "audio.wav"
+
+        # Transcribe the audio
+        transcript_result = stt.transcribe_bytes(audio_buffer)
+
+        logger.info(f"Voice transcription: {transcript_result}")
+
+        return {
+            "transcript": transcript_result.get("transcript", ""),
+            "filename": file.filename,
+            "success": True,
+        }
+
+    except Exception as e:
+        logger.error(f"Voice upload error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/voice/start-recording")
+async def start_voice_recording(input: VoiceRecordingInput):
+    """Start voice recording session"""
+    if not openai_client:
+        raise HTTPException(status_code=500, detail="OpenAI client not initialized")
+
+    try:
+        # Generate recording session ID if not provided
+        recording_id = input.sessionId or str(uuid.uuid4())
+
+        # Store recording session data
+        voice_recordings[recording_id] = {
+            "status": "recording",
+            "duration": input.duration,
+            "chunk_duration": input.chunk_duration,
+            "lag": input.lag,
+            "start_time": datetime.now().isoformat(),
+            "transcripts": [],
+        }
+
+        logger.info(f"Started voice recording session: {recording_id}")
+
+        return {
+            "recording_id": recording_id,
+            "status": "recording",
+            "duration": input.duration,
+            "message": "Voice recording started",
+        }
+
+    except Exception as e:
+        logger.error(f"Start recording error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/voice/stop-recording/{recording_id}")
+async def stop_voice_recording(recording_id: str, background_tasks: BackgroundTasks):
+    """Stop voice recording and get transcripts"""
+    if recording_id not in voice_recordings:
+        raise HTTPException(status_code=404, detail="Recording session not found")
+
+    try:
+        recording_data = voice_recordings[recording_id]
+        recording_data["status"] = "stopped"
+        recording_data["end_time"] = datetime.now().isoformat()
+
+        # Add background task to clean up old recordings
+        background_tasks.add_task(cleanup_old_recordings)
+
+        logger.info(f"Stopped voice recording session: {recording_id}")
+
+        return {
+            "recording_id": recording_id,
+            "status": "stopped",
+            "transcripts": recording_data.get("transcripts", []),
+            "duration": recording_data.get("duration", 0),
+        }
+
+    except Exception as e:
+        logger.error(f"Stop recording error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/voice/record-and-transcribe")
+async def record_and_transcribe(input: VoiceRecordingInput):
+    """Record voice for specified duration and transcribe"""
+    if not openai_client:
+        raise HTTPException(status_code=500, detail="OpenAI client not initialized")
+
+    try:
+        logger.info(f"Starting voice recording for {input.duration} seconds")
+
+        # Use the timed_listen_and_transcribe function
+        transcript_buffer = timed_listen_and_transcribe(
+            client=openai_client,
+            duration=input.duration,
+            chunk_duration=input.chunk_duration,
+            lag=input.lag,
+            timeout=10,
+        )
+
+        # Extract all transcripts from buffer
+        transcripts = []
+        while not transcript_buffer.empty():
+            try:
+                transcript_data = transcript_buffer.get_nowait()
+                transcripts.append(transcript_data)
+            except:
+                break
+
+        # Combine all transcripts
+        combined_transcript = " ".join(
+            [t.get("transcript", "") for t in transcripts if t.get("transcript")]
+        )
+
+        logger.info(f"Voice recording completed. Combined transcript: {combined_transcript}")
+
+        return {
+            "transcript": combined_transcript,
+            "individual_transcripts": transcripts,
+            "duration": input.duration,
+            "success": True,
+        }
+
+    except Exception as e:
+        logger.error(f"Record and transcribe error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/voice/chat")
+async def voice_chat(input: VoiceChatInput):
+    """Process voice input and return chat response"""
+    global current_session_id
+
+    if not openai_client:
+        raise HTTPException(status_code=500, detail="OpenAI client not initialized")
+
+    try:
+        transcript = ""
+
+        # If audio data provided, transcribe it first
+        if input.audioData:
+            import base64
+            import io
+
+            # Decode base64 audio data
+            audio_bytes = base64.b64decode(input.audioData)
+            audio_buffer = io.BytesIO(audio_bytes)
+            audio_buffer.name = "voice_input.wav"
+
+            # Transcribe
+            stt = STT(client=openai_client, logger=logger)
+            transcript_result = stt.transcribe_bytes(audio_buffer)
+            transcript = transcript_result.get("transcript", "")
+
+            logger.info(f"Voice chat transcription: {transcript}")
+
+        if not transcript:
+            raise HTTPException(status_code=400, detail="No transcript available")
+
+        # Use the transcript as user input for the chatbot
+        chat_input = ChatInput(
+            userInput=transcript,
+            chatHistory=input.chatHistory,
+            memory=input.memory,
+            sessionId=input.sessionId,
+        )
+
+        # Process through existing chat pipeline
+        chat_response = await chat_message(chat_input)
+
+        # Add the transcript to the response
+        if hasattr(chat_response, 'body'):
+            # If it's a JSONResponse, extract the data
+            import json
+
+            response_data = json.loads(chat_response.body.decode())
+            response_data['transcript'] = transcript
+            return response_data
+        else:
+            # If it's already a dict, add transcript
+            chat_response['transcript'] = transcript
+            return chat_response
+
+    except Exception as e:
+        logger.error(f"Voice chat error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+async def cleanup_old_recordings():
+    """Clean up old recording sessions"""
+    try:
+        current_time = datetime.now()
+        expired_sessions = []
+
+        for session_id, data in voice_recordings.items():
+            start_time = datetime.fromisoformat(data.get("start_time", current_time.isoformat()))
+            if (current_time - start_time).total_seconds() > 3600:  # 1 hour
+                expired_sessions.append(session_id)
+
+        for session_id in expired_sessions:
+            del voice_recordings[session_id]
+
+        if expired_sessions:
+            logger.info(f"Cleaned up {len(expired_sessions)} expired recording sessions")
+
+    except Exception as e:
+        logger.error(f"Error cleaning up recordings: {e}")

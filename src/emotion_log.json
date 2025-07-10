@@ -196,5 +196,191 @@
     "emotion": "neutral",
     "confidence": 0.0,
     "response": "Hi Adam! It's great to meet you. How are you feeling today?"
+  },
+  {
+    "input": "\u0633\u0648\u0641\u0627\u0631\u064a.",
+    "emotion": "neutral",
+    "confidence": 0.0,
+    "response": "\u064a\u0628\u062f\u0648 \u0623\u0646\u0643 \u0643\u062a\u0628\u062a \u0643\u0644\u0645\u0629 \u0648\u0627\u062d\u062f\u0629 \u0641\u0642\u0637. \u0647\u0644 \u062a\u0631\u063a\u0628 \u0641\u064a \u0627\u0644\u062a\u062d\u062f\u062b \u0639\u0646 \u0634\u064a\u0621 \u0645\u0639\u064a\u0646\u061f \u0623\u0646\u0627 \u0647\u0646\u0627 \u0644\u0644\u0627\u0633\u062a\u0645\u0627\u0639 \u0648\u0645\u0633\u0627\u0639\u062f\u062a\u0643 \u0628\u0623\u064a \u0637\u0631\u064a\u0642\u0629 \u062a\u062d\u062a\u0627\u062c\u0647\u0627. \ud83d\ude0a"
+  },
+  {
+    "input": "Hi im Adam",
+    "emotion": "neutral",
+    "confidence": 0.0,
+    "response": "Hi Adam! It's great to meet you. What's on your mind today?"
+  },
+  {
+    "input": "You",
+    "emotion": "neutral",
+    "confidence": 0.0,
+    "response": "Hey there! It looks like you might have something on your mind. How are you feeling today?"
+  },
+  {
+    "input": "Oh",
+    "emotion": "neutral",
+    "confidence": 0.0,
+    "response": "Hey there! Seems like something might be on your mind. Want to share what's going on?"
+  },
+  {
+    "input": "Hello, this is a test message",
+    "emotion": "neutral",
+    "confidence": 0.0,
+    "response": "Hi there! If you have anything you'd like to talk about or any feelings you'd like to share, I'm here to listen."
+  },
+  {
+    "input": "Hello, my name is Adam.",
+    "emotion": "neutral",
+    "confidence": 0.0,
+    "response": "Hi Adam! It's nice to meet you. How are you feeling today?"
+  },
+  {
+    "input": "I'm great something fun actually happen",
+    "emotion": "excited",
+    "confidence": 0.95,
+    "response": "That's awesome! What fun thing happened? I'd love to hear about it!"
+  },
+  {
+    "input": "I'm a tired, tired person.",
+    "emotion": "sad",
+    "confidence": 0.85,
+    "response": "It sounds like you're feeling really drained. Can you tell me more about what's making you feel so tired?"
+  },
+  {
+    "input": "I don't know, I really don't feel like it.",
+    "emotion": "anxious",
+    "confidence": 0.85,
+    "response": "That's okay. It's important to talk when you're ready. If there's something else on your mind or something that would make you feel better, we can focus on that instead."
+  },
+  {
+    "input": "a a a a a a a a a a",
+    "emotion": "neutral",
+    "confidence": 0.0,
+    "response": "It sounds like you have something on your mind. Would you like to share more about what you're feeling or thinking?"
+  },
+  {
+    "input": "Hello, how are you?",
+    "emotion": "neutral",
+    "confidence": 0.0,
+    "response": "Hi there! I'm here and ready to chat. How are you feeling today?"
+  },
+  {
+    "input": "Can you tell me a joke?",
+    "emotion": "neutral",
+    "confidence": 0.0,
+    "response": "Sure thing! Why did the scarecrow win an award? Because he was outstanding in his field! \ud83d\ude0a What's something that makes you laugh?"
+  },
+  {
+    "input": "What's the weather like?",
+    "emotion": "neutral",
+    "confidence": 0.0,
+    "response": "I can't check the weather right now, but you can ask someone nearby or check a weather app! Do you like sunny days or rainy days more?"
+  },
+  {
+    "input": "Tell me about yourself",
+    "emotion": "neutral",
+    "confidence": 0.0,
+    "response": "I'm here to help you talk about your thoughts and feelings! I like listening and sharing ideas that might make things a bit easier for you. What's something you'd like to chat about today?"
+  },
+  {
+    "input": "Hi, I'm Adam.",
+    "emotion": "neutral",
+    "confidence": 0.0,
+    "response": "Hi Adam! It's great to meet you. How's your day going so far?"
+  },
+  {
+    "input": "Yeah, it's six o'clock and I'm already tired.",
+    "emotion": "sad",
+    "confidence": 0.75,
+    "response": "That sounds tough. Did something make today extra tiring?"
+  },
+  {
+    "input": "Hello",
+    "emotion": "neutral",
+    "confidence": 0.0,
+    "response": "Hi there! How are you feeling today?"
+  },
+  {
+    "input": "How are you?",
+    "emotion": "neutral",
+    "confidence": 0.0,
+    "response": "Thanks for asking! I'm here and ready to chat with you. What's on your mind today?"
+  },
+  {
+    "input": "Tell me a joke",
+    "emotion": "neutral",
+    "confidence": 0.0,
+    "response": "Sure! Why did the scarecrow win an award? Because he was outstanding in his field! What do you think?"
+  },
+  {
+    "input": "I don't know what to think.",
+    "emotion": "neutral",
+    "confidence": 0.0,
+    "response": "That's okay! Sometimes it can be really hard to know what to think or feel. Do you want to share what's on your mind, or maybe talk about something specific that's been bothering you?"
+  },
+  {
+    "input": "I'm just tired, but there's a lot of things to do.",
+    "emotion": "anxious",
+    "confidence": 0.85,
+    "response": "Feeling tired when you have lots to do can be really tough. Sometimes it helps to make a list so you can see everything clearly. You could try doing one small thing at a time and take breaks in between. What do you think might help you feel a bit better right now?"
+  },
+  {
+    "input": "Hello",
+    "emotion": "neutral",
+    "confidence": 0.0,
+    "response": "Hi there! How are you feeling today?"
+  },
+  {
+    "input": "How are you?",
+    "emotion": "neutral",
+    "confidence": 0.0,
+    "response": "I'm here and ready to chat with you. What's on your mind today?"
+  },
+  {
+    "input": "Tell me something interesting",
+    "emotion": "neutral",
+    "confidence": 0.0,
+    "response": "Did you know that octopuses have three hearts? Two pump blood to their gills, while the third pumps it to the rest of their body. Pretty cool, right? What do you find interesting?"
+  },
+  {
+    "input": "Hi, my name is Adam.",
+    "emotion": "neutral",
+    "confidence": 0.0,
+    "response": "Hi Adam! It's great to meet you. What's on your mind today?"
+  },
+  {
+    "input": "I'm okay, nothing special happened.",
+    "emotion": "neutral",
+    "confidence": 0.85,
+    "response": "That's alright! Sometimes ordinary days are nice. Is there anything specific you\u2019d like to talk about or explore together?"
+  },
+  {
+    "input": "I have been thinking recently about, I don't know, maybe playing guitar.",
+    "emotion": "neutral",
+    "confidence": 0.0,
+    "response": "That sounds like a cool idea! Playing guitar can be a fun way to express yourself. Do you have a particular type of music or song you'd like to learn?"
+  },
+  {
+    "input": "Hi, how are you doing?",
+    "emotion": "neutral",
+    "confidence": 0.0,
+    "response": "Hello! I\u2019m here and ready to chat with you. How are you feeling today?"
+  },
+  {
+    "input": "I'm good, you can hear me clearly.",
+    "emotion": "neutral",
+    "confidence": 0.0,
+    "response": "Great! I can \"hear\" you just fine. Anything on your mind you'd like to talk about today?"
+  },
+  {
+    "input": "Hi there.",
+    "emotion": "neutral",
+    "confidence": 0.0,
+    "response": "Hey! How are you feeling today?"
+  },
+  {
+    "input": "Fine, everything is okay.",
+    "emotion": "neutral",
+    "confidence": 0.85,
+    "response": "Okay, glad to hear it! Is there anything specific you'd like to talk about or share?"
   }
 ]
