@@ -1,0 +1,11 @@
+loaders:
+  - type: python
+    search_path: ["./src"]
+    discover: true
+
+processors:
+  - type: filter
+    documented_only: true
+
+renderer:
+  type: markdown

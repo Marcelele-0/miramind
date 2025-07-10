@@ -16,7 +16,8 @@ os.environ.pop("SSL_CERT_FILE", None)
 load_dotenv()
 
 # --- Constants ---
-DEFAULT_MODEL = "gpt-4o"
+DEFAULT_MODEL = "gpt-4o-mini"  # Use faster model for better performance
+RESPONSE_MODEL = "gpt-4o-mini"  # Keep consistent for speed
 LOG_FILE = "emotion_log.json"
 
 
@@ -62,10 +63,10 @@ def call_openai(
         response = client.chat.completions.create(
             model=model,
             messages=messages,
-            max_tokens=max_tokens,
+            max_tokens=max_tokens or 100,  # Default to shorter responses for speed
             temperature=temperature,
             stream=False,  # Disable streaming for faster single responses
-            timeout=10.0,  # Add timeout to prevent hanging
+            timeout=8.0,  # Reduced timeout for faster fails
         )
         return response.choices[0].message.content.strip()
     except Exception as e:
@@ -120,10 +121,10 @@ def generate_response(style: str, client: OpenAI, tts_provider, emotion_logger: 
 
         messages = (
             [{"role": "system", "content": system_content}]
-            + chat_history[-4:]  # Limit context to last 4 messages for faster processing
+            + chat_history[-2:]  # Reduced to last 2 messages for faster processing
             + [{"role": "user", "content": user_input}]
         )
-        reply = call_openai(client, messages, max_tokens=150, temperature=0.7)
+        reply = call_openai(client, messages, max_tokens=80, temperature=0.7)  # Reduced token limit
 
         # Map emotions to TTS-supported emotions
         emotion_mapping = {

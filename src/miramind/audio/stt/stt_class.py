@@ -38,7 +38,7 @@ class STT:
             dict[str: str]: dict containing transcript (with key "transcript")
         """
         transcript = self.client.audio.transcriptions.create(
-            model=os.environ.get("STT_DEPLOYMENT", "gpt-4o-transcribe"),
+            model=os.environ.get("STT_DEPLOYMENT", "whisper-1"),
             file=bytes,
             response_format="json",
         )

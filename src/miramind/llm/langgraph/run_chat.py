@@ -7,7 +7,7 @@ from concurrent.futures import ThreadPoolExecutor
 from functools import lru_cache
 from typing import Optional
 
-from miramind.llm.langgraph.chatbot import chatbot
+from miramind.llm.langgraph.chatbot import get_chatbot
 from miramind.llm.langgraph.performance_monitor import get_performance_monitor
 from miramind.shared.logger import logger
 
@@ -16,17 +16,28 @@ logger.info("Logger works inside run_chat.py")
 # Performance monitor
 perf_monitor = get_performance_monitor()
 
-# Thread pool for CPU-bound tasks
-executor = ThreadPoolExecutor(max_workers=2)
+# Thread pool for CPU-bound tasks - increased workers for better performance
+executor = ThreadPoolExecutor(max_workers=4)
 
-# Simple cache for repeated requests
+# Enhanced cache for repeated requests
 response_cache = {}
+MAX_CACHE_SIZE = 100  # Limit cache size
 
 
 def _hash_input(user_input: str, emotion: str = "neutral") -> str:
     """Create a hash key for caching responses."""
     content = f"{user_input.lower().strip()}_{emotion}"
     return hashlib.md5(content.encode()).hexdigest()
+
+
+def _cleanup_cache():
+    """Remove oldest entries if cache is too large"""
+    if len(response_cache) > MAX_CACHE_SIZE:
+        # Remove oldest 20% of entries
+        remove_count = len(response_cache) // 5
+        oldest_keys = list(response_cache.keys())[:remove_count]
+        for key in oldest_keys:
+            del response_cache[key]
 
 
 # Define the path where the output.wav should be saved inside frontend/public
@@ -39,7 +50,7 @@ OUTPUT_AUDIO_PATH = os.path.abspath(OUTPUT_AUDIO_PATH)
 def process_chat_message(user_input_text: str, chat_history: list = [], memory: str = ""):
     """
     Processes a single chat message using the chatbot and saves the response audio.
-    Now with performance monitoring and caching.
+    Now with performance monitoring and enhanced caching.
     """
     with perf_monitor.track_operation("total_chat_processing"):
         state = {"chat_history": chat_history, "user_input": user_input_text, "memory": memory}
@@ -53,7 +64,8 @@ def process_chat_message(user_input_text: str, chat_history: list = [], memory: 
 
         try:
             with perf_monitor.track_operation("chatbot_invoke"):
-                state = chatbot.invoke(state)
+                chatbot_instance = get_chatbot()
+                state = chatbot_instance.invoke(state)
 
             response_text = state.get("response")
             audio_data = state.get("response_audio")
@@ -78,8 +90,9 @@ def process_chat_message(user_input_text: str, chat_history: list = [], memory: 
                     "memory": updated_memory,
                 }
 
-            # Update cache
+            # Update cache with cleanup
             with perf_monitor.track_operation("cache_update"):
+                _cleanup_cache()  # Clean cache before adding
                 response_cache[cache_key] = result
                 logger.info(f"Response cached with key: {cache_key}")
 
@@ -101,10 +114,17 @@ async def process_chat_message_async(
     """
     state = {"chat_history": chat_history, "user_input": user_input_text, "memory": memory}
 
+    # Check cache first (async)
+    cache_key = _hash_input(user_input_text)
+    if cache_key in response_cache:
+        logger.info(f"Cache hit (async) for key: {cache_key}")
+        return response_cache[cache_key]
+
     try:
         # Run chatbot processing in thread pool to avoid blocking
         loop = asyncio.get_event_loop()
-        state = await loop.run_in_executor(executor, chatbot.invoke, state)
+        chatbot_instance = get_chatbot()
+        state = await loop.run_in_executor(executor, chatbot_instance.invoke, state)
 
         response_text = state.get("response")
         audio_data = state.get("response_audio")
@@ -113,19 +133,24 @@ async def process_chat_message_async(
         if audio_data:
             # Run file I/O in thread pool
             await loop.run_in_executor(executor, _save_audio_file, audio_data)
-            return {
+            result = {
                 "response_text": response_text,
                 "audio_file_path": OUTPUT_AUDIO_PATH,
                 "memory": updated_memory,
             }
         else:
-            return {
+            result = {
                 "response_text": response_text,
                 "audio_file_path": None,
                 "memory": updated_memory,
             }
+
+        # Update cache asynchronously
+        await loop.run_in_executor(executor, _update_cache, cache_key, result)
+
+        return result
     except Exception as e:
-        logger.error(f"Error processing chat message: {e}")
+        logger.error(f"Error processing chat message (async): {e}")
         return {
             "response_text": "I'm sorry, I couldn't process that.",
             "audio_file_path": None,
@@ -138,6 +163,13 @@ def _save_audio_file(audio_data: bytes) -> None:
     os.makedirs(os.path.dirname(OUTPUT_AUDIO_PATH), exist_ok=True)
     with open(OUTPUT_AUDIO_PATH, "wb") as f:
         f.write(audio_data)
+
+
+def _update_cache(cache_key: str, result: dict) -> None:
+    """Helper function to update cache in thread pool."""
+    _cleanup_cache()  # Clean cache before adding
+    response_cache[cache_key] = result
+    logger.info(f"Response cached with key: {cache_key}")
 
 
 def main():
