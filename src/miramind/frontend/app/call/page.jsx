@@ -2,395 +2,51 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import audioUtils from "@/lib/audioUtils";
-import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+
+// Import custom components
+import {
+  AudioControls,
+  AudioVisualizer,
+  BotResponse,
+  ChatHistory,
+  EndCallButton,
+  LoadingIndicator,
+  ModeToggle,
+  StartCallScreen,
+  TextInput,
+  VoiceInput,
+} from "@/components/call";
+
+// Import custom hooks
+import { useAudio } from "@/hooks/useAudio";
+import { useVoiceRecording } from "@/hooks/useVoiceRecording";
 
 export default function CallPage() {
+  const router = useRouter();
+
+  // State management
   const [userInput, setUserInput] = useState("");
   const [botText, setBotText] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(false);
   const [hasStarted, setHasStarted] = useState(false);
   const [chatHistory, setChatHistory] = useState([]);
-  const [volume, setVolume] = useState(0);
-  const [sessionId, setSessionId] = useState(null); // Track current session
-
-  // Voice recording states
-  const [isRecording, setIsRecording] = useState(false);
-  const [mediaRecorder, setMediaRecorder] = useState(null);
-  const [recordedChunks, setRecordedChunks] = useState([]);
-  const [recordingTimer, setRecordingTimer] = useState(0);
+  const [sessionId, setSessionId] = useState(null);
   const [recordingMode, setRecordingMode] =
-    useState("text"); // 'text' or 'voice'
+    useState("text");
 
-  const audioRef = useRef(null);
-  const analyserRef = useRef(null);
-  const animationFrameRef = useRef(null);
-  const audioCtxRef = useRef(null);
-  const sourceRef = useRef(null);
-  const timerRef = useRef(null);
-  const audioElementConnected = useRef(false); // Track if audio element is connected
+  // Custom hooks
+  const { audioRef, volume, isPlaying, playAudioResponse } =
+    useAudio();
+  const {
+    isRecording,
+    recordingTimer,
+    startRecording,
+    stopRecording,
+  } = useVoiceRecording();
 
-  const startAudioVisualization = () => {
-    try {
-      // Ensure we have a valid audio context
-      if (!audioCtxRef.current) {
-        console.error(
-          "No audio context available for visualization"
-        );
-        return;
-      }
-
-      // Create source node only if audio element hasn't been connected before
-      if (
-        audioRef.current &&
-        !audioElementConnected.current
-      ) {
-        try {
-          // Disconnect old source if it exists
-          if (sourceRef.current) {
-            try {
-              sourceRef.current.disconnect();
-            } catch (e) {
-              console.log(
-                "Error disconnecting old source:",
-                e
-              );
-            }
-          }
-
-          // Create new source node for the current context
-          sourceRef.current =
-            audioCtxRef.current.createMediaElementSource(
-              audioRef.current
-            );
-          audioElementConnected.current = true; // Mark as connected
-          console.log("Created new audio source node");
-        } catch (error) {
-          console.error(
-            "Error creating MediaElementSource:",
-            error
-          );
-
-          // If we can't create a source, skip visualization but still allow audio playback
-          console.log(
-            "Skipping visualization due to MediaElementSource error"
-          );
-          return;
-        }
-      } else if (
-        audioRef.current &&
-        audioElementConnected.current
-      ) {
-        console.log(
-          "Audio element already connected, reusing existing source"
-        );
-
-        // If we have an existing source but it's from a different context, we can't use it
-        if (
-          sourceRef.current &&
-          sourceRef.current.context !== audioCtxRef.current
-        ) {
-          console.log(
-            "Source is from different context, skipping visualization"
-          );
-          return;
-        }
-      }
-
-      const analyser = audioCtxRef.current.createAnalyser();
-      analyser.fftSize = 256;
-
-      const dataArray = new Uint8Array(
-        analyser.frequencyBinCount
-      );
-
-      // Only connect if we have a valid source for this context
-      if (
-        sourceRef.current &&
-        sourceRef.current.context === audioCtxRef.current
-      ) {
-        try {
-          sourceRef.current.connect(analyser);
-          console.log("Connected source to analyser");
-        } catch (error) {
-          console.error(
-            "Error connecting source to analyser:",
-            error
-          );
-          return;
-        }
-      } else {
-        console.log(
-          "No valid source for current context, skipping visualization"
-        );
-        return;
-      }
-
-      analyser.connect(audioCtxRef.current.destination);
-      analyserRef.current = analyser;
-
-      const update = () => {
-        if (
-          analyserRef.current &&
-          audioCtxRef.current &&
-          audioCtxRef.current.state === "running"
-        ) {
-          analyserRef.current.getByteFrequencyData(
-            dataArray
-          );
-          const avg =
-            dataArray.reduce((sum, val) => sum + val, 0) /
-            dataArray.length;
-          setVolume(avg);
-          animationFrameRef.current =
-            requestAnimationFrame(update);
-        }
-      };
-
-      update();
-    } catch (error) {
-      console.error(
-        "Error in startAudioVisualization:",
-        error
-      );
-    }
-  };
-
-  // Simplified audio playback function that avoids MediaElementSource issues
-  const playAudioResponse = async (audioPath) => {
-    try {
-      console.log(
-        "=== Starting simplified audio playback ==="
-      );
-
-      // Stop any currently playing audio
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current.currentTime = 0;
-
-        // Remove all event listeners
-        audioRef.current.onended = null;
-        audioRef.current.onerror = null;
-        audioRef.current.oncanplay = null;
-        audioRef.current.onloadeddata = null;
-      }
-
-      // Clean up existing audio context and visualization
-      if (animationFrameRef.current) {
-        cancelAnimationFrame(animationFrameRef.current);
-        animationFrameRef.current = null;
-      }
-
-      if (sourceRef.current) {
-        try {
-          sourceRef.current.disconnect();
-        } catch (e) {
-          console.log("Error disconnecting source:", e);
-        }
-        sourceRef.current = null;
-      }
-
-      if (audioCtxRef.current) {
-        try {
-          if (audioCtxRef.current.state !== "closed") {
-            await audioCtxRef.current.close();
-          }
-        } catch (e) {
-          console.log("Error closing audio context:", e);
-        }
-        audioCtxRef.current = null;
-      }
-
-      // Reset states
-      setVolume(0);
-      setIsPlaying(false);
-
-      // Try loading audio from different endpoints
-      const timestamp = Date.now();
-      const audioSources = [
-        `/output.wav?t=${timestamp}`,
-        `/api/audio/output.wav?t=${timestamp}`,
-        `/static/output.wav?t=${timestamp}`,
-      ];
-
-      let audioLoaded = false;
-
-      for (const src of audioSources) {
-        try {
-          console.log(
-            `Attempting to load audio from: ${src}`
-          );
-
-          // Set the source
-          audioRef.current.src = src;
-          audioRef.current.load();
-
-          // Wait for the audio to be ready
-          await new Promise((resolve, reject) => {
-            const timeout = setTimeout(() => {
-              reject(new Error("Audio load timeout"));
-            }, 5000);
-
-            const onCanPlay = () => {
-              clearTimeout(timeout);
-              audioRef.current.removeEventListener(
-                "canplay",
-                onCanPlay
-              );
-              audioRef.current.removeEventListener(
-                "error",
-                onError
-              );
-              audioRef.current.removeEventListener(
-                "loadeddata",
-                onLoadedData
-              );
-              resolve();
-            };
-
-            const onLoadedData = () => {
-              clearTimeout(timeout);
-              audioRef.current.removeEventListener(
-                "canplay",
-                onCanPlay
-              );
-              audioRef.current.removeEventListener(
-                "error",
-                onError
-              );
-              audioRef.current.removeEventListener(
-                "loadeddata",
-                onLoadedData
-              );
-              resolve();
-            };
-
-            const onError = (error) => {
-              clearTimeout(timeout);
-              audioRef.current.removeEventListener(
-                "canplay",
-                onCanPlay
-              );
-              audioRef.current.removeEventListener(
-                "error",
-                onError
-              );
-              audioRef.current.removeEventListener(
-                "loadeddata",
-                onLoadedData
-              );
-              reject(error);
-            };
-
-            audioRef.current.addEventListener(
-              "canplay",
-              onCanPlay,
-              { once: true }
-            );
-            audioRef.current.addEventListener(
-              "loadeddata",
-              onLoadedData,
-              { once: true }
-            );
-            audioRef.current.addEventListener(
-              "error",
-              onError,
-              { once: true }
-            );
-          });
-
-          console.log(
-            `✓ Audio loaded successfully from: ${src}`
-          );
-          audioLoaded = true;
-          break;
-        } catch (error) {
-          console.log(
-            `✗ Failed to load audio from ${src}:`,
-            error
-          );
-          continue;
-        }
-      }
-
-      if (!audioLoaded) {
-        throw new Error(
-          "Failed to load audio from any source"
-        );
-      }
-
-      // Set up simple event handlers (no visualization)
-      audioRef.current.onended = () => {
-        console.log("Audio playback ended");
-        setIsPlaying(false);
-        setVolume(0);
-      };
-
-      audioRef.current.onerror = (error) => {
-        console.error("Audio playback error:", error);
-        setIsPlaying(false);
-        setVolume(0);
-      };
-
-      // Enhanced volume simulation with more realistic audio-correlated animation
-      const simulateVolume = () => {
-        if (
-          audioRef.current &&
-          !audioRef.current.paused &&
-          !audioRef.current.ended
-        ) {
-          const currentTime =
-            audioRef.current.currentTime || 0;
-          const duration = audioRef.current.duration || 1;
-
-          // Create multiple frequency components for more realistic visualization
-          const baseFreq = Math.sin(currentTime * 8) * 25;
-          const midFreq = Math.sin(currentTime * 15) * 15;
-          const highFreq = Math.sin(currentTime * 25) * 10;
-
-          // Add some randomness to simulate speech patterns
-          const speechPattern = Math.random() * 20;
-
-          // Combine frequencies with some decay for natural feel
-          const combinedVolume = Math.abs(
-            baseFreq + midFreq + highFreq + speechPattern
-          );
-
-          // Add slight pulsing effect
-          const pulse = Math.sin(currentTime * 3) * 5 + 5;
-
-          setVolume(Math.min(combinedVolume + pulse, 80));
-
-          animationFrameRef.current =
-            requestAnimationFrame(simulateVolume);
-        } else {
-          setVolume(0);
-        }
-      };
-
-      // Play the audio
-      console.log("Starting audio playback...");
-      await audioRef.current.play();
-      setIsPlaying(true);
-      console.log("✓ Audio playback started successfully");
-
-      // Start volume simulation
-      simulateVolume();
-    } catch (error) {
-      console.error("Error in playAudioResponse:", error);
-      setIsPlaying(false);
-      setVolume(0);
-
-      // Clean up on error
-      if (animationFrameRef.current) {
-        cancelAnimationFrame(animationFrameRef.current);
-        animationFrameRef.current = null;
-      }
-    }
-  };
-
+  // Handle text input submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!userInput.trim()) return;
@@ -463,61 +119,23 @@ export default function CallPage() {
     }
   };
 
-  // Voice recording functions
-  const startRecording = async () => {
+  // Handle voice recording with custom hook
+  const handleStartRecording = async () => {
     try {
-      const stream =
-        await navigator.mediaDevices.getUserMedia({
-          audio: true,
-        });
-
-      const recorder = new MediaRecorder(stream);
-      const chunks = [];
-
-      recorder.ondataavailable = (event) => {
-        if (event.data.size > 0) {
-          chunks.push(event.data);
-        }
-      };
-
-      recorder.onstop = async () => {
-        const audioBlob = new Blob(chunks, {
-          type: "audio/wav",
-        });
-        await processVoiceInput(audioBlob);
-
-        // Stop all tracks to stop recording indicator
-        stream.getTracks().forEach((track) => track.stop());
-
-        // Reset timer
-        clearInterval(timerRef.current);
-        setRecordingTimer(0);
-      };
-
-      recorder.start();
-      setMediaRecorder(recorder);
-      setIsRecording(true);
-      setRecordedChunks(chunks);
-
-      // Start timer
-      timerRef.current = setInterval(() => {
-        setRecordingTimer((prev) => prev + 1);
-      }, 1000);
+      await startRecording();
     } catch (error) {
       console.error("Error starting recording:", error);
-      alert(
-        "Unable to access microphone. Please check permissions."
-      );
     }
   };
 
-  const stopRecording = () => {
-    if (
-      mediaRecorder &&
-      mediaRecorder.state !== "inactive"
-    ) {
-      mediaRecorder.stop();
-      setIsRecording(false);
+  const handleStopRecording = async () => {
+    try {
+      const audioBlob = await stopRecording();
+      if (audioBlob) {
+        await processVoiceInput(audioBlob);
+      }
+    } catch (error) {
+      console.error("Error stopping recording:", error);
     }
   };
 
@@ -580,276 +198,75 @@ export default function CallPage() {
     }
   };
 
-  const formatTime = (seconds) =>
-    audioUtils.formatTime(seconds);
-
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      if (
-        mediaRecorder &&
-        mediaRecorder.state !== "inactive"
-      ) {
-        mediaRecorder.stop();
-      }
-
-      // Clean up audio source
-      if (sourceRef.current) {
-        try {
-          sourceRef.current.disconnect();
-        } catch (e) {
-          console.log(
-            "Error disconnecting source on cleanup:",
-            e
-          );
-        }
-        sourceRef.current = null;
-      }
-
-      // Reset audio element connection flag
-      audioElementConnected.current = false;
-
-      // Clean up audio context
-      if (audioCtxRef.current) {
-        try {
-          if (audioCtxRef.current.state !== "closed") {
-            audioCtxRef.current.close();
-          }
-        } catch (e) {
-          console.log(
-            "Error closing audio context on cleanup:",
-            e
-          );
-        }
-        audioCtxRef.current = null;
-      }
-
-      // Clean up animation frame
-      if (animationFrameRef.current) {
-        cancelAnimationFrame(animationFrameRef.current);
-        animationFrameRef.current = null;
-      }
-
-      setVolume(0);
-    };
-  }, [mediaRecorder]);
-
-  // Cleanup effect
-  useEffect(() => {
-    return () => {
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-      }
-      if (animationFrameRef.current) {
-        cancelAnimationFrame(animationFrameRef.current);
-      }
-    };
-  }, []);
-
+  // Render start screen if call hasn't started
   if (!hasStarted) {
     return (
-      <main className="flex min-h-screen flex-col items-center justify-center p-24 bg-[#c7afd5] bg-[url('/images/background.png')] bg-cover bg-center">
-        <div className="w-72 h-72 rounded-full bg-[#dcd3f2] mb-10 flex items-center justify-center">
-          <img
-            src="/images/sound.png"
-            alt="sound"
-            width={250}
-            height={250}
-          />
-        </div>
-        <Button
-          onClick={handleStartCall}
-          className="mb-4 bg-[#4dff5f] hover:bg-[#468345]"
-        >
-          Start a Call
-        </Button>
-      </main>
+      <StartCallScreen onStartCall={handleStartCall} />
     );
   }
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24 bg-[#c7afd5]">
-      <div className="w-72 h-72 rounded-full bg-[#dcd3f2] mb-10 flex items-center justify-center relative overflow-hidden">
-        {/* Animated background rings when audio is playing */}
-        {isPlaying && (
-          <>
-            <div
-              className="absolute inset-0 rounded-full border-4 border-[#4dff5f] opacity-20"
-              style={{
-                transform: `scale(${Math.min(
-                  1 + volume / 150,
-                  1.3
-                )})`,
-                transition:
-                  "transform 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
-              }}
-            />
-            <div
-              className="absolute inset-2 rounded-full border-2 border-[#f9c6cd] opacity-40"
-              style={{
-                transform: `scale(${Math.min(
-                  1 + volume / 200,
-                  1.2
-                )})`,
-                transition:
-                  "transform 0.25s cubic-bezier(0.4, 0, 0.2, 1)",
-              }}
-            />
-          </>
-        )}
-
-        <img
-          src="/images/sound.png"
-          alt="sound"
-          width={250}
-          height={250}
-          className="relative z-10"
-          style={{
-            transform: `scale(${Math.min(
-              1 + volume / 120,
-              1.4
-            )}) rotate(${isPlaying ? volume / 20 : 0}deg)`,
-            transition:
-              "transform 0.15s cubic-bezier(0.4, 0, 0.2, 1)",
-            filter: isPlaying
-              ? `brightness(${1 + volume / 300}) saturate(${
-                  1 + volume / 150
-                })`
-              : "none",
-          }}
-        />
+      {/* End Call Button */}
+      <div className="absolute top-6 left-6">
+        <Button
+          onClick={() => router.push("/")}
+          className="bg-[#e61010] hover:bg-[#b16161] text-white"
+        >
+          End Call
+        </Button>
       </div>
+
+      {/* Audio Visualizer */}
+      <AudioVisualizer
+        isPlaying={isPlaying}
+        volume={volume}
+      />
 
       <Card className="w-full max-w-lg bg-[#dcd3f2]">
         <CardContent className="p-6">
           {/* Mode Toggle */}
-          <div className="flex mb-4 space-x-2">
-            <Button
-              type="button"
-              onClick={() => setRecordingMode("text")}
-              variant={
-                recordingMode === "text"
-                  ? "default"
-                  : "outline"
-              }
-              className="flex-1"
-            >
-              💬 Text
-            </Button>
-            <Button
-              type="button"
-              onClick={() => setRecordingMode("voice")}
-              variant={
-                recordingMode === "voice"
-                  ? "default"
-                  : "outline"
-              }
-              className="flex-1"
-            >
-              🎤 Voice
-            </Button>
-          </div>
+          <ModeToggle
+            recordingMode={recordingMode}
+            onModeChange={setRecordingMode}
+          />
 
           {/* Text Input Mode */}
           {recordingMode === "text" && (
-            <form
+            <TextInput
+              userInput={userInput}
+              onInputChange={setUserInput}
               onSubmit={handleSubmit}
-              className="flex space-x-2"
-            >
-              <Input
-                type="text"
-                placeholder="Type your message..."
-                value={userInput}
-                onChange={(e) =>
-                  setUserInput(e.target.value)
-                }
-                disabled={isLoading}
-              />
-              <Button
-                type="submit"
-                disabled={isLoading}
-                className="bg-[#f9c6cd] hover:bg-[#e8b0b5] text-white"
-              >
-                Send
-              </Button>
-            </form>
+              isLoading={isLoading}
+            />
           )}
 
           {/* Voice Input Mode */}
           {recordingMode === "voice" && (
-            <div className="flex flex-col space-y-4">
-              <div className="flex items-center justify-center space-x-4">
-                {!isRecording ? (
-                  <Button
-                    onClick={startRecording}
-                    disabled={isLoading}
-                    className="bg-[#4dff5f] hover:bg-[#468345] text-white px-8 py-4 rounded-full text-lg"
-                  >
-                    🎤 Start Recording
-                  </Button>
-                ) : (
-                  <div className="flex flex-col items-center space-y-2">
-                    <Button
-                      onClick={stopRecording}
-                      className="bg-red-500 hover:bg-red-600 text-white px-8 py-4 rounded-full text-lg animate-pulse"
-                    >
-                      ⏹️ Stop Recording
-                    </Button>
-                    <div className="text-sm text-gray-600">
-                      Recording:{" "}
-                      {formatTime(recordingTimer)}
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {isRecording && (
-                <div className="flex justify-center">
-                  <div className="w-4 h-4 bg-red-500 rounded-full animate-pulse"></div>
-                  <span className="ml-2 text-sm text-gray-600">
-                    Recording in progress...
-                  </span>
-                </div>
-              )}
-            </div>
+            <VoiceInput
+              isRecording={isRecording}
+              isLoading={isLoading}
+              recordingTimer={recordingTimer}
+              onStartRecording={handleStartRecording}
+              onStopRecording={handleStopRecording}
+            />
           )}
 
-          {isLoading && (
-            <div className="mt-4 flex justify-center">
-              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
-              <span className="ml-2 text-sm text-gray-600">
-                Processing...
-              </span>
-            </div>
-          )}
+          {/* Loading Indicator */}
+          <LoadingIndicator isLoading={isLoading} />
 
-          <div className="mt-6 text-white">
-            <h3 className="text-lg font-semibold mb-2">
-              Bot response:
-            </h3>
-            <p>{botText}</p>
-          </div>
+          {/* Bot Response */}
+          <BotResponse botText={botText} />
 
-          <div className="mt-6 text-white">
-            <h3 className="text-lg font-semibold mb-2">
-              Conversation:
-            </h3>
-            <div className="max-h-60 overflow-y-auto space-y-1">
-              {chatHistory.map((entry, index) => (
-                <p key={index}>
-                  <strong>
-                    {entry.role === "user" ? "You" : "Bot"}:
-                  </strong>{" "}
-                  {entry.content}
-                </p>
-              ))}
-            </div>
-          </div>
+          {/* Chat History */}
+          <ChatHistory chatHistory={chatHistory} />
 
-          <audio
-            ref={audioRef}
-            controls
-            className="mt-6 w-full glassmorphism"
+          {/* Audio Controls */}
+          <AudioControls ref={audioRef} />
+
+          {/* End Call Button */}
+          <EndCallButton
+            onEndCall={() => router.push("/")}
           />
         </CardContent>
       </Card>

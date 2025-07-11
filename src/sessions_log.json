@@ -858,5 +858,153 @@
         "botResponse": "That’s okay! Sometimes having a quiet day can be nice. Is there anything you like to do on days like this?"
       }
     ]
+  },
+  {
+    "sessionId": "dd88c797-cfaf-4406-b787-8c7d79cb35cc",
+    "startTime": "2025-07-10T21:53:34.200476",
+    "messages": [
+      {
+        "timestamp": "2025-07-10T21:53:46.677195",
+        "userInput": "🎤 Ще го проверя една последна път.",
+        "emotion": "neutral",
+        "confidence": 0.0,
+        "botResponse": "Разбирам, че искаш да се увериш, че всичко е наред. Какви чувства те обземат в момента, когато мислиш за това?"
+      }
+    ]
+  },
+  {
+    "sessionId": "90293499-8384-4926-b1ab-9670d9eadb4d",
+    "startTime": "2025-07-10T21:54:00.850565",
+    "messages": [
+      {
+        "timestamp": "2025-07-10T21:54:14.053232",
+        "userInput": "🎤 I want to check it one last time.",
+        "emotion": "neutral",
+        "confidence": 0.0,
+        "botResponse": "It sounds like you might be feeling a bit anxious about something. What’s on your mind that you want to check again?"
+      },
+      {
+        "timestamp": "2025-07-10T21:54:28.633024",
+        "userInput": "🎤 If this project is working.",
+        "emotion": "neutral",
+        "confidence": 0.0,
+        "botResponse": "It seems like you might have some doubts about the project. What specific parts are you unsure about?"
+      }
+    ]
+  },
+  {
+    "sessionId": "ad2b21d4-ee6c-4892-805c-2e4b6173f9bd",
+    "startTime": "2025-07-11T07:23:03.350450",
+    "messages": [
+      {
+        "timestamp": "2025-07-11T07:23:13.873481",
+        "userInput": "🎤 Good morning, how are you?",
+        "emotion": "neutral",
+        "confidence": 0.0,
+        "botResponse": "Good morning! I’m here and ready to chat. How are you feeling today?"
+      },
+      {
+        "timestamp": "2025-07-11T07:23:29.345374",
+        "userInput": "🎤 I haven't slept well.",
+        "emotion": "neutral",
+        "confidence": 0.0,
+        "botResponse": "That sounds tough. Lack of sleep can really affect how we feel. What do you think is keeping you from getting the rest you need?"
+      }
+    ]
+  },
+  {
+    "sessionId": "5e594de8-61ba-4359-a56d-bfce1cf200ec",
+    "startTime": "2025-07-11T07:25:28.270494",
+    "messages": []
+  },
+  {
+    "sessionId": "d2457849-b5ee-4a1a-84b8-4aacd1239dab",
+    "startTime": "2025-07-11T07:26:42.645970",
+    "messages": [
+      {
+        "timestamp": "2025-07-11T07:26:53.135406",
+        "userInput": "🎤 Hi there, what's up?",
+        "emotion": "neutral",
+        "confidence": 0.0,
+        "botResponse": "Not much, just here to chat! How are you feeling today?"
+      },
+      {
+        "timestamp": "2025-07-11T07:27:05.429446",
+        "userInput": "🎤 Fine, fine, it's nothing special.",
+        "emotion": "neutral",
+        "confidence": 0.0,
+        "botResponse": "Sometimes “nothing special” can feel a bit bland. Is there anything on your mind that you’d like to share?"
+      }
+    ]
+  },
+  {
+    "sessionId": "cf69278a-57d9-4f45-8747-86e3f3f0b300",
+    "startTime": "2025-07-11T07:29:16.729541",
+    "messages": []
+  },
+  {
+    "sessionId": "64285b9a-f9b0-497b-b774-3524939417be",
+    "startTime": "2025-07-11T07:29:39.241268",
+    "messages": []
+  },
+  {
+    "sessionId": "074938b2-531b-447c-b9db-3116f8e3d663",
+    "startTime": "2025-07-11T07:31:21.200682",
+    "messages": []
+  },
+  {
+    "sessionId": "d1179ad1-fc28-4ff4-a30a-cdfb64014a8b",
+    "startTime": "2025-07-11T07:37:55.630607",
+    "messages": []
+  },
+  {
+    "sessionId": "b1bd39f4-3101-47ca-b700-d2c5e313f911",
+    "startTime": "2025-07-11T07:41:36.437424",
+    "messages": []
+  },
+  {
+    "sessionId": "2dfece18-e61d-4907-9222-a33763a3680a",
+    "startTime": "2025-07-11T08:23:02.580541",
+    "messages": []
+  },
+  {
+    "sessionId": "b55c5d28-e2c2-48cc-921a-2d44bdd761cf",
+    "startTime": "2025-07-11T08:26:14.053030",
+    "messages": [
+      {
+        "timestamp": "2025-07-11T08:26:27.038484",
+        "userInput": "🎤 Hi there, everything is okay?",
+        "emotion": "neutral",
+        "confidence": 0.0,
+        "botResponse": "Hi! I'm glad to see you here. How are you feeling today?"
+      }
+    ]
+  },
+  {
+    "sessionId": "db53e1a2-587f-4adb-8356-948d2a7a184c",
+    "startTime": "2025-07-11T08:37:04.121204",
+    "messages": [
+      {
+        "timestamp": "2025-07-11T08:37:13.164632",
+        "userInput": "🎤 Hi, my name is Adam.",
+        "emotion": "neutral",
+        "confidence": 0.0,
+        "botResponse": "Hi Adam! It's great to meet you. How are you feeling today?"
+      },
+      {
+        "timestamp": "2025-07-11T08:37:25.913644",
+        "userInput": "🎤 I'm fine, thank you.",
+        "emotion": "neutral",
+        "confidence": 0.0,
+        "botResponse": "I’m glad to hear that! Is there anything on your mind today that you'd like to talk about?"
+      },
+      {
+        "timestamp": "2025-07-11T08:37:39.072695",
+        "userInput": "🎤 Nothing really. And you?",
+        "emotion": "neutral",
+        "confidence": 0.0,
+        "botResponse": "I’m always here to listen! If you think of something you want to share or explore, just let me know. How do you usually like to spend your time?"
+      }
+    ]
   }
 ]
