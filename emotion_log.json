@@ -1,0 +1,110 @@
+[
+  {
+    "input": "Hi my name is Adam",
+    "emotion": "neutral",
+    "confidence": 0.85,
+    "response": "Hi Adam! It\u2019s great to meet you. How are you feeling today?"
+  },
+  {
+    "input": "I'm okay, I just want to talk.",
+    "emotion": "neutral",
+    "confidence": 0.85,
+    "response": "That sounds good! What\u2019s on your mind? Anything specific you\u2019d like to share?"
+  },
+  {
+    "input": "Hmm, nothing pretty.",
+    "emotion": "sad",
+    "confidence": 0.85,
+    "response": "That\u2019s okay! Sometimes it\u2019s hard to find the right words. What\u2019s something that\u2019s been on your mind lately?"
+  },
+  {
+    "input": "I just want to check if everything is good before I will go to sleep",
+    "emotion": "anxious",
+    "confidence": 0.85,
+    "response": "It\u2019s great that you want to check in! What\u2019s on your mind? Are there specific thoughts or feelings you\u2019d like to talk about before bed?"
+  },
+  {
+    "input": "No, nothing special, I'm just... just checking.",
+    "emotion": "neutral",
+    "confidence": 0.85,
+    "response": "That's totally fine! Sometimes just checking in can be helpful. Is there anything you enjoy doing before bed that helps you relax?"
+  },
+  {
+    "input": "Hi there, how are you?",
+    "emotion": "neutral",
+    "confidence": 0.85,
+    "response": "I'm here and ready to chat! What\u2019s on your mind today?"
+  },
+  {
+    "input": "I'm fine. Nothing special happened.",
+    "emotion": "neutral",
+    "confidence": 0.85,
+    "response": "That\u2019s okay! Sometimes having a quiet day can be nice. Is there anything you like to do on days like this?"
+  },
+  {
+    "input": "\u0429\u0435 \u0433\u043e \u043f\u0440\u043e\u0432\u0435\u0440\u044f \u0435\u0434\u043d\u0430 \u043f\u043e\u0441\u043b\u0435\u0434\u043d\u0430 \u043f\u044a\u0442.",
+    "emotion": "anxious",
+    "confidence": 0.85,
+    "response": "\u0420\u0430\u0437\u0431\u0438\u0440\u0430\u043c, \u0447\u0435 \u0438\u0441\u043a\u0430\u0448 \u0434\u0430 \u0441\u0435 \u0443\u0432\u0435\u0440\u0438\u0448, \u0447\u0435 \u0432\u0441\u0438\u0447\u043a\u043e \u0435 \u043d\u0430\u0440\u0435\u0434. \u041a\u0430\u043a\u0432\u0438 \u0447\u0443\u0432\u0441\u0442\u0432\u0430 \u0442\u0435 \u043e\u0431\u0437\u0435\u043c\u0430\u0442 \u0432 \u043c\u043e\u043c\u0435\u043d\u0442\u0430, \u043a\u043e\u0433\u0430\u0442\u043e \u043c\u0438\u0441\u043b\u0438\u0448 \u0437\u0430 \u0442\u043e\u0432\u0430?"
+  },
+  {
+    "input": "I want to check it one last time.",
+    "emotion": "anxious",
+    "confidence": 0.85,
+    "response": "It sounds like you might be feeling a bit anxious about something. What\u2019s on your mind that you want to check again?"
+  },
+  {
+    "input": "If this project is working.",
+    "emotion": "neutral",
+    "confidence": 0.85,
+    "response": "It seems like you might have some doubts about the project. What specific parts are you unsure about?"
+  },
+  {
+    "input": "Good morning, how are you?",
+    "emotion": "neutral",
+    "confidence": 0.85,
+    "response": "Good morning! I\u2019m here and ready to chat. How are you feeling today?"
+  },
+  {
+    "input": "I haven't slept well.",
+    "emotion": "anxious",
+    "confidence": 0.85,
+    "response": "That sounds tough. Lack of sleep can really affect how we feel. What do you think is keeping you from getting the rest you need?"
+  },
+  {
+    "input": "Hi there, what's up?",
+    "emotion": "neutral",
+    "confidence": 0.85,
+    "response": "Not much, just here to chat! How are you feeling today?"
+  },
+  {
+    "input": "Fine, fine, it's nothing special.",
+    "emotion": "neutral",
+    "confidence": 0.85,
+    "response": "Sometimes \u201cnothing special\u201d can feel a bit bland. Is there anything on your mind that you\u2019d like to share?"
+  },
+  {
+    "input": "Hi there, everything is okay?",
+    "emotion": "neutral",
+    "confidence": 0.85,
+    "response": "Hi! I'm glad to see you here. How are you feeling today?"
+  },
+  {
+    "input": "Hi, my name is Adam.",
+    "emotion": "neutral",
+    "confidence": 0.85,
+    "response": "Hi Adam! It's great to meet you. How are you feeling today?"
+  },
+  {
+    "input": "I'm fine, thank you.",
+    "emotion": "neutral",
+    "confidence": 0.85,
+    "response": "I\u2019m glad to hear that! Is there anything on your mind today that you'd like to talk about?"
+  },
+  {
+    "input": "Nothing really. And you?",
+    "emotion": "neutral",
+    "confidence": 0.85,
+    "response": "I\u2019m always here to listen! If you think of something you want to share or explore, just let me know. How do you usually like to spend your time?"
+  }
+]
